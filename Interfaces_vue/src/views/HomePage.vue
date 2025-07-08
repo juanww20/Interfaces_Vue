@@ -1,7 +1,7 @@
 <template>
-    <h1>Hello world</h1>
+    <ComponenteBanner></ComponenteBanner>
 </template>
 
 <script setup>
-
+import ComponenteBanner from '@/components/ComponenteBanner.vue';
 </script>
