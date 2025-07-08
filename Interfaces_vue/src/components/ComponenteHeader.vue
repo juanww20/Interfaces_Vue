@@ -1,0 +1,86 @@
+<template>
+<header id="header" class="fixed-top">
+  <div class="container">
+    <div class="logo float-left">
+      <a href="#intro" class="scrollto"><img :src="logo" alt="" class="img-fluid"></a>
+    </div>
+
+    <nav class="main-nav d-none d-lg-block">
+      <ul>
+        <li class="active"><a href="#intro" routerLink="/">Home</a></li>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#portfolio">Portfolio</a></li>
+        <li class="drop-down"><a href="">Drop Down</a>
+          <ul>
+            <li><a href="#">Drop Down 1</a></li>
+            <li class="drop-down"><a href="#">Drop Down 2</a>
+              <ul>
+                <li><a href="#">Deep Drop Down 1</a></li>
+                <li><a href="#">Deep Drop Down 2</a></li>
+                <li><a href="#">Deep Drop Down 3</a></li>
+                <li><a href="#">Deep Drop Down 4</a></li>
+                <li><a href="#">Deep Drop Down 5</a></li>
+              </ul>
+            </li>
+            <li><a href="#">Drop Down 3</a></li>
+            <li><a href="#">Drop Down 4</a></li>
+            <li><a href="#">Drop Down 5</a></li>
+          </ul>
+        </li>
+        <li><a href="#contact">Contact Us</a></li>
+        <li><a routerLink="/login">Login</a></li>
+        <li><a routerLink="/admin">Admin</a></li>
+        <li ><a routerLink="/perfil">Perfil</a></li>
+        <li >
+          <a href="#logout">Logout</a>
+        </li>
+      </ul>
+    </nav>
+
+    <button type="button" class="mobile-nav-toggle d-lg-none">
+      <i class="fa fa-bars"></i>
+    </button>
+
+    <nav class="mobile-nav d-lg-none">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/#about">About Us</a></li>
+        <li><a href="/#services">Services</a></li>
+        <li><a href="/#portfolio">Portfolio</a></li>
+        <li class="drop-down">
+          <a href="#">Drop Down</a>
+          <ul>
+            <li><a href="#">Drop Down 1</a></li>
+            <li class="drop-down">
+              <a href="#">Drop Down 2</a>
+              <ul>
+                <li><a href="#">Deep Drop Down 1</a></li>
+                <li><a href="#">Deep Drop Down 2</a></li>
+                <li><a href="#">Deep Drop Down 3</a></li>
+                <li><a href="#">Deep Drop Down 4</a></li>
+                <li><a href="#">Deep Drop Down 5</a></li>
+              </ul>
+            </li>
+            <li><a href="#">Drop Down 3</a></li>
+            <li><a href="#">Drop Down 4</a></li>
+            <li><a href="#">Drop Down 5</a></li>
+          </ul>
+        </li>
+        <li><a href="#contact">Contact Us</a></li>
+        <li><a routerLink="/login">Login</a></li>
+        <li ><a routerLink="/admin">Admin</a></li>
+        <li >
+          <a href="#logout">Logout ({{ (currentUser$ | async)?.email }})</a>
+        </li>
+      </ul>
+    </nav>
+    
+    <div class="mobile-nav-overly"></div>
+  </div>
+</header>
+</template>
+
+<script setup>
+import logo from '@/assets/img/logo.png'
+</script>
