@@ -3,6 +3,7 @@
     <ComponenteAboutSection></ComponenteAboutSection>
     <ComponenteSectionService></ComponenteSectionService>
     <ComponentePortafolio></ComponentePortafolio>
+    <ComponenteCarousel></ComponenteCarousel>
     <ComponenteContactoSection></ComponenteContactoSection>
 </template>
 
@@ -12,4 +13,5 @@ import ComponenteAboutSection from '@/components/ComponenteAboutSection.vue';
 import ComponenteSectionService from '@/components/ComponenteSectionService.vue';
 import ComponenteContactoSection from '@/components/ComponenteContactoSection.vue';
 import ComponentePortafolio from '@/components/ComponentePortafolio.vue';
+import ComponenteCarousel from '@/components/ComponenteCarousel.vue';
 </script>

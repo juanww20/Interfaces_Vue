@@ -7,7 +7,7 @@
 
     <nav class="main-nav d-none d-lg-block">
       <ul>
-        <li class="active"><a href="#intro" routerLink="/">Home</a></li>
+        <li class="active"><router-link href="#intro" to="/">Home</router-link></li>
         <li><a href="#about">About Us</a></li>
         <li><a href="#services">Services</a></li>
         <li><a href="#portfolio">Portfolio</a></li>
@@ -30,7 +30,7 @@
         </li>
         <li><a href="#contact">Contact Us</a></li>
         <li><a routerLink="/login">Login</a></li>
-        <li><a routerLink="/admin">Admin</a></li>
+        <li><router-link to="/administrador">Admin</router-link></li>
         <li ><a routerLink="/perfil">Perfil</a></li>
         <li >
           <a href="#logout">Logout</a>
