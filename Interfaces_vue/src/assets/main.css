@@ -1490,3 +1490,157 @@ map-btn {
   color: #555;
   margin-left: 8px;
 }
+/*Nuevo estilo para navbar LEA BIEN ************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #2c3e50;
+  position: relative;
+}
+
+/* Estilos para el botón hamburguesa */
+.navbar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: 1001;
+}
+
+/* Estilos para el menú de navegación */
+.navbar-menu {
+  display: flex;
+  transition: transform 0.3s ease;
+}
+
+.navbar-links {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-links li a {
+  display: block;
+  position: relative;
+  color: var(--dark-color);
+  padding: 10px 15px;
+  transition: 0.3s;
+  font-size: var(--text-font);
+  font-family: var(--font-secundaria);
+  font-weight: 500;
+}
+
+.navbar-links a:hover,
+.navbar-links .active > a,
+.navbar-links li:hover > a {
+  color: var(--secondary-color);
+  text-decoration: none;
+}
+
+/* Estilos para los menús desplegables */
+.drop-down {
+  position: relative;
+}
+
+.drop-down > ul {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  min-width: 200px;
+  background: var(--ligth-color);
+  display: none;
+  z-index: 100;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.drop-down:hover > ul {
+  display: block;
+}
+
+.drop-down .drop-down > ul {
+  left: 100%;
+  top: 0;
+}
+
+/* Estilos para el overlay */
+.navbar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.navbar-overlay.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.Hamburguesa{
+  color:var(--dark-color);
+}
+
+/* Estilos para móviles */
+@media (max-width: 768px) {
+  .navbar-toggle {
+    margin-left: auto;
+    display: block;
+  }
+
+  .navbar-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100vh;
+    flex-direction: column;
+    padding-top: 60px;
+    background-color: var(--dark-color);
+    transform: translateX(-100%);
+    z-index: 1000;
+  }
+
+  .navbar-menu.is-active {
+    transform: translateX(0);
+  }
+
+  .navbar-links {
+    flex-direction: column;
+  }
+
+  .navbar-links li {
+    width: 100%;
+  }
+
+  .navbar-links li a {
+    padding: 1rem;
+    color: var(--ligth-color);
+  }
+
+  /* Menús desplegables en móvil */
+  .drop-down > ul {
+    position: static;
+    display: none;
+    padding-left: 20px;
+    background-color: var(--dark-color);
+    box-shadow: none;
+  }
+
+  .drop-down.active > ul {
+    display: block;
+  }
+
+  .drop-down .drop-down > ul {
+    left: auto;
+  }
+}
+/*Aqui se acaba el nuevo navbar POR FAVOR LEA ************************************************************************************************************************************************************************************************************************************************************************************************************************/

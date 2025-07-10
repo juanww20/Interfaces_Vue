@@ -1,86 +1,109 @@
 <template>
-<header id="header" class="fixed-top">
-  <div class="container">
-    <div class="logo float-left">
-      <a href="#intro" class="scrollto"><img :src="logo" alt="" class="img-fluid"></a>
-    </div>
+  <header id="header" class="fixed-top">
+    <div class="container">
+      <div class="logo float-left">
+        <a href="#intro" class="scrollto"><img :src="logo" alt="" class="img-fluid"></a>
+      </div>
 
-    <nav class="main-nav d-none d-lg-block">
-      <ul>
-        <li class="active"><router-link href="#intro" to="/">Home</router-link></li>
-        <li><a href="#about">About Us</a></li>
-        <li><a href="#services">Services</a></li>
-        <li><a href="#portfolio">Portfolio</a></li>
-        <li class="drop-down"><a href="">Drop Down</a>
-          <ul>
-            <li><a href="#">Drop Down 1</a></li>
-            <li class="drop-down"><a href="#">Drop Down 2</a>
-              <ul>
-                <li><a href="#">Deep Drop Down 1</a></li>
-                <li><a href="#">Deep Drop Down 2</a></li>
-                <li><a href="#">Deep Drop Down 3</a></li>
-                <li><a href="#">Deep Drop Down 4</a></li>
-                <li><a href="#">Deep Drop Down 5</a></li>
-              </ul>
-            </li>
-            <li><a href="#">Drop Down 3</a></li>
-            <li><a href="#">Drop Down 4</a></li>
-            <li><a href="#">Drop Down 5</a></li>
-          </ul>
-        </li>
-        <li><a href="#contact">Contact Us</a></li>
-        <li><a routerLink="/login">Login</a></li>
-        <li><router-link to="/administrador">Admin</router-link></li>
-        <li ><a routerLink="/perfil">Perfil</a></li>
-        <li >
-          <a href="#logout">Logout</a>
-        </li>
-      </ul>
-    </nav>
-
-    <button type="button" class="mobile-nav-toggle d-lg-none">
-      <i class="fa fa-bars"></i>
+       <!-- Botón hamburguesa para móviles -->
+    <button 
+      class="navbar-toggle" 
+      @click="toggleMenu"
+      aria-label="Toggle navigation"
+      aria-expanded="isMenuOpen"
+    >
+      <i class="fa fa-bars Hamburguesa"></i>
     </button>
 
-    <nav class="mobile-nav d-lg-none">
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/#about">About Us</a></li>
-        <li><a href="/#services">Services</a></li>
-        <li><a href="/#portfolio">Portfolio</a></li>
-        <li class="drop-down">
-          <a href="#">Drop Down</a>
+      <!-- Navbar para desktop -->
+      <nav class="navbar-menu" 
+      :class="{ 'is-active': isMenuOpen }"
+      >
+      <div>
+        
+      </div>
+        <ul class="navbar-links">
+          <li class="active"><router-link href="#intro" to="/" @click="closeMenu">Home</router-link></li>
+          <li><a href="#about" @click="closeMenu">About Us</a></li>
+          <li><a href="#services" @click="closeMenu">Services</a></li>
+          <li><a href="#portfolio" @click="closeMenu">Portfolio</a></li>
+          <li class="drop-down">
+          <a href="#" @click.prevent="toggleDropdown($event)">Drop Down</a>
           <ul>
-            <li><a href="#">Drop Down 1</a></li>
+            <li><a href="#" @click="closeMenu">Drop Down 1</a></li>
             <li class="drop-down">
-              <a href="#">Drop Down 2</a>
+              <a href="#" @click.prevent="toggleDropdown($event)">Drop Down 2</a>
               <ul>
-                <li><a href="#">Deep Drop Down 1</a></li>
-                <li><a href="#">Deep Drop Down 2</a></li>
-                <li><a href="#">Deep Drop Down 3</a></li>
-                <li><a href="#">Deep Drop Down 4</a></li>
-                <li><a href="#">Deep Drop Down 5</a></li>
+                <li><a href="#" @click="closeMenu">Deep Drop Down 1</a></li>
+                <li><a href="#" @click="closeMenu">Deep Drop Down 2</a></li>
+                <li><a href="#" @click="closeMenu">Deep Drop Down 3</a></li>
+                <li><a href="#" @click="closeMenu">Deep Drop Down 4</a></li>
+                <li><a href="#" @click="closeMenu">Deep Drop Down 5</a></li>
               </ul>
             </li>
-            <li><a href="#">Drop Down 3</a></li>
-            <li><a href="#">Drop Down 4</a></li>
-            <li><a href="#">Drop Down 5</a></li>
+            <li><a href="#" @click="closeMenu">Drop Down 3</a></li>
+            <li><a href="#" @click="closeMenu">Drop Down 4</a></li>
+            <li><a href="#" @click="closeMenu">Drop Down 5</a></li>
           </ul>
         </li>
-        <li><a href="#contact">Contact Us</a></li>
-        <li><a routerLink="/login">Login</a></li>
-        <li ><a routerLink="/admin">Admin</a></li>
-        <li >
-          <a href="#logout">Logout ({{ (currentUser$ | async)?.email }})</a>
-        </li>
-      </ul>
-    </nav>
-    
-    <div class="mobile-nav-overly"></div>
-  </div>
-</header>
+          <li><a href="#contact" @click="closeMenu">Contact Us</a></li>
+          <li><a href="/login" @click="closeMenu">Login</a></li>
+          <li><router-link to="/administrador" @click="closeMenu">Admin</router-link></li>
+          <li><router-link to="/perfil" @click="closeMenu">Perfil</router-link></li>
+          <li><a href="#logout" @click="closeMenu">Logout</a></li>
+        </ul>
+      </nav>
+
+      <!-- Overlay para móviles -->
+    <div 
+      class="navbar-overlay" 
+      :class="{ 'is-active': isMenuOpen }"
+      @click="closeMenu"
+    ></div>
+
+    </div>
+  </header>
 </template>
 
 <script setup>
 import logo from '@/assets/img/logo.png'
+
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+
+const isMenuOpen = ref(false);
+const isMobile = ref(false);
+
+const checkScreenSize = () => {
+  isMobile.value = window.innerWidth < 768;
+  if (!isMobile.value) {
+    isMenuOpen.value = false;
+  }
+};
+
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
+};
+
+const closeMenu = () => {
+  if (isMobile.value) {
+    isMenuOpen.value = false;
+  }
+};
+
+const toggleDropdown = (event) => {
+  if (isMobile.value) {
+    const parent = event.target.closest('li');
+    parent.classList.toggle('active');
+  }
+  // En desktop, el hover ya manejará el despliegue
+};
+
+onMounted(() => {
+  checkScreenSize();
+  window.addEventListener('resize', checkScreenSize);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', checkScreenSize);
+});
 </script>
