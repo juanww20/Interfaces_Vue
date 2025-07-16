@@ -3,6 +3,7 @@ import HomePage from '@/views/HomePage.vue'
 import AdminPage from '@/views/AdminPage.vue'
 import AuthPage from '@/views/AuthPage.vue'
 import { useAuthStore } from '@/stores/Auth'
+import Error404Page from '@/views/Error_404Page.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +27,11 @@ const router = createRouter({
       name: 'auth',
       component: AuthPage
      },
+     {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: Error404Page
+    }
     // {
     //   path: '/about',
     //   name: 'about',
