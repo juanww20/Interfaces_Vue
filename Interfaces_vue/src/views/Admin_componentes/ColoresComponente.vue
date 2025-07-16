@@ -44,7 +44,30 @@
     </div>
     
     <div>
-    <h1>Hola Mundo</h1>
+    <div class="row">
+            <fieldset class="control-panel">
+                <div class="saved-styles">
+                    <h3>Estilos guardados</h3>
+                    <div id="savedStylesList" class="custom-scrollbar" >
+                        <div class="saved-style-item">
+                            <span>EU</span>
+                            <div class="color-preview">
+                                <div class="color-box" style="background-color: #3498db;"></div>
+                                <div class="color-box" style="background-color: #3498db;"></div>
+                                <div class="color-box" style="background-color: #3498db;"></div>
+                                <div class="color-box" style="background-color: #3498db;"></div>
+                                <div class="color-box" style="background-color: #3498db;"></div>
+                            </div>
+                            <div class="style-actions">
+                                <button >✅ Aplicar</button>
+                                <button >✏️ Editar</button>
+                                <button >🗑️ Eliminar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
   </div>
 
   <div class="playground">
