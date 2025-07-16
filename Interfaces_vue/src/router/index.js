@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '@/views/HomePage.vue'
 import AdminPage from '@/views/AdminPage.vue'
+import Error404Page from '@/views/Error_404Page.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,7 +15,12 @@ const router = createRouter({
       path:'/administrador',
       name:'administrador',
       component:AdminPage
-     }
+     },
+     {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: Error404Page
+    }
     // {
     //   path: '/about',
     //   name: 'about',
