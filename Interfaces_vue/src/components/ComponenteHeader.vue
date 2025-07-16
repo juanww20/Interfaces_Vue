@@ -2,7 +2,9 @@
   <header id="header" class="fixed-top">
     <div class="container">
       <div class="logo float-left">
-        <a href="#intro" class="scrollto"><img :src="logo" alt="" class="img-fluid"></a>
+        <router-link to="/" class="scrollto">
+          <img :src="logo" alt="Logo" class="img-fluid" />
+        </router-link>
       </div>
 
        <!-- Botón hamburguesa para móviles -->
@@ -23,7 +25,7 @@
         
       </div>
         <ul class="navbar-links">
-          <li class="active"><router-link href="#intro" to="/" @click="closeMenu">Home</router-link></li>
+          <li :class="{ active: isActive('/') }"><router-link to="/" @click="closeMenu">Home</router-link></li>
           <li><a href="#about" @click="closeMenu">About Us</a></li>
           <li><a href="#services" @click="closeMenu">Services</a></li>
           <li><a href="#portfolio" @click="closeMenu">Portfolio</a></li>
@@ -47,10 +49,23 @@
           </ul>
         </li>
           <li><a href="#contact" @click="closeMenu">Contact Us</a></li>
-          <li><a href="/login" @click="closeMenu">Login</a></li>
-          <li><router-link to="/administrador" @click="closeMenu">Admin</router-link></li>
-          <li><router-link to="/perfil" @click="closeMenu">Perfil</router-link></li>
-          <li><a href="#logout" @click="closeMenu">Logout</a></li>
+
+          <!-- Si NO ha iniciado sesión -->
+          <li v-if="!auth.user" :class="{ active: isActive('/auth') }">
+            <router-link to="/auth" @click="closeMenu">Login</router-link>
+          </li>
+          
+          <!-- Si está autenticado -->
+          <template v-else>
+            <li v-if="auth.user.role === 'user'" :class="{ active: isActive('/perfil') }"><router-link to="/perfil" @click="closeMenu">Perfil</router-link></li>
+
+            <!-- Solo para admin -->
+            <li v-if="auth.user.role === 'admin'" :class="{ active: isActive('/administrador') }">
+              <router-link to="/administrador" @click="closeMenu">Admin</router-link>
+            </li>
+
+            <li><a href="#" @click="logout">Logout</a></li>
+          </template>
         </ul>
       </nav>
 
@@ -67,11 +82,22 @@
 
 <script setup>
 import logo from '@/assets/img/logo.png'
-
+import { useAuthStore } from '@/stores/Auth';
+import { useRouter } from 'vue-router'
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 
 const isMenuOpen = ref(false);
 const isMobile = ref(false);
+const router = useRouter();
+const auth = useAuthStore();
+
+const isActive = (path) => {
+  return router.currentRoute.value.path === path;
+};
+const logout = async () => {
+  await auth.logout()
+  router.push('/auth')
+}
 
 const checkScreenSize = () => {
   isMobile.value = window.innerWidth < 768;
