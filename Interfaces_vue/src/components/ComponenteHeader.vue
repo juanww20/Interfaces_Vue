@@ -20,10 +20,9 @@
       <!-- Navbar para desktop -->
       <nav class="navbar-menu" 
       :class="{ 'is-active': isMenuOpen }"
+      v-if="!auth.loading"
       >
-      <div>
-        
-      </div>
+      
         <ul class="navbar-links">
           <li :class="{ active: isActive('/') }"><router-link to="/" @click="closeMenu">Home</router-link></li>
           <li><a href="#about" @click="closeMenu">About Us</a></li>
@@ -68,6 +67,8 @@
           </template>
         </ul>
       </nav>
+
+      <div v-else class="loader">Cargando sesión...</div>
 
       <!-- Overlay para móviles -->
     <div 

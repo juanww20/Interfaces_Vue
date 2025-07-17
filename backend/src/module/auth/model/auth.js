@@ -78,11 +78,21 @@ export class ModelAuth {
             
             const users1 = await User.findAll({
                 where : { status : true },
+                include: {
+                    model: Role,
+                    as: 'role',
+                    attributes: ['name']
+                },
                 attributes: { exclude: ['password'] } 
             });
 
             const users2 = await User.findAll({
                 where : { status : false },
+                include: {
+                    model: Role,
+                    as: 'role',
+                    attributes: ['name']
+                },
                 attributes: { exclude: ['password'] }
             });
 
@@ -137,6 +147,11 @@ export class ModelAuth {
         try {
 
             const user = await User.findByPk(user_id, {
+                include: {
+                    model: Role,
+                    as: 'role',
+                    attributes: ['name']
+                },
                 attributes: { exclude: ['password'] }
             });
 

@@ -96,8 +96,9 @@ export class ControllerAuth {
     }
 
     static async getSectionId(req, res) {
-        
+
         try {
+            
             const result = await ModelAuth.getbyID(req.user.user_id);
             return res.status(result.status).json({ message: result.message, data: result.data ?? null });
         } catch (error) {

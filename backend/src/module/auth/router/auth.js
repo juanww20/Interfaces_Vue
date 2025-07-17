@@ -5,12 +5,12 @@ import { authorizeRole } from "../../../middlewares/authRole.js"
 
 export const routerAuth = Router();
 
+routerAuth.get('/me', authMiddleware, ControllerAuth.getSectionId);
 routerAuth.post("/register", ControllerAuth.create);
 routerAuth.post("/login", ControllerAuth.login);
 routerAuth.post("/logout", authMiddleware, ControllerAuth.logout);
 routerAuth.get("/", authMiddleware, authorizeRole("admin"), ControllerAuth.getAll);
 routerAuth.patch("/:id", authMiddleware, authorizeRole("user", "admin"), ControllerAuth.update);
 routerAuth.delete("/:id", ControllerAuth.delete);
-routerAuth.get("/:id", authMiddleware,authorizeRole("user","admin"), ControllerAuth.getById);
-routerAuth.get('/me', authMiddleware, ControllerAuth.getSectionId);
+routerAuth.get("/:id", authMiddleware, authorizeRole("user","admin"), ControllerAuth.getById);
 

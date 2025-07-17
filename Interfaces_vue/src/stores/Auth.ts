@@ -13,7 +13,10 @@ export const useAuthStore = defineStore('auth', {
       try {
         const res = await userService.login(data)
         if (res && res.status) {
-          this.user = res.data
+          this.user = {
+            ...res.data,
+            role: res.data.role?.name || res.data.role,
+          }
           return true
         }
       } catch (e) {
@@ -33,7 +36,11 @@ export const useAuthStore = defineStore('auth', {
       try {
         const res = await userService.getSectionId()
         if (res && res.status) {
-          this.user = res.data
+          this.user = {
+            ...res.data,
+            role: res.data.role?.name || res.data.role,
+          }
+          
           return true
         }
       } catch (e) {
