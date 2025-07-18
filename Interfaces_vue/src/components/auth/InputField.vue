@@ -1,6 +1,6 @@
 <template>
   <div class="form-field">
-    <label :for="name" style="font-family: var(--font-secundary);">
+    <label :for="name" style="font-family: var(--font-secundaria);">
       {{ label }}
     </label>
     <input
@@ -16,7 +16,7 @@
       }"
     />
     <div v-if="error" class="error-message">
-      <span style="font-family: var(--font-secundary);">{{ errorMessage }}</span>
+      <span style="font-family: var(--font-secundaria);">{{ errorMessage }}</span>
     </div>
   </div>
 </template>

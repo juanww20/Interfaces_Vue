@@ -1,6 +1,6 @@
 <template>
   <header class="header">
-    <h3>Carousel</h3>
+    <h3 style="font-size: var(--title-font);">Carousel</h3>
   </header>
     <Carousel v-bind="config" class="contendor">
     <Slide v-for="(image,index) in imagenes" :key="index">
@@ -53,14 +53,10 @@ const config = {
   text-align: center;
 }
 
-:root {
-  background-color: #242424;
-}
-
 .carousel {
-  --vc-pgn-background-color: rgba(255, 255, 255, 0.7);
-  --vc-pgn-active-color: rgba(255, 255, 255, 1);
-  --vc-nav-background: rgba(52, 157, 255, 0.7);
+  --vc-pgn-background-color: var(--ligth-color);
+  --vc-pgn-active-color: var(--primary-color);
+  --vc-nav-background: var(--secondary-color);
   --vc-nav-border-radius: 100%;
 }
 
@@ -73,15 +69,15 @@ img {
 
 .custom-slide {
   width: 300px; /* Altura fija */
-  background: #f5f5f5;
-  color: #333;
+  background: var(--ligth-color);
+  color: var(--primary-color);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: var(--text-font);
   font-weight: bold;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px var(--dark-color);
 }
 
 /* Ajustar el espaciado entre slides */

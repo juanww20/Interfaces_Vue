@@ -22,14 +22,14 @@ import Imagen from '@/assets/page404.gif'
 }
 
 .error-message h1 {
-    font-size: 5rem;
+    font-size: var(--text-font);
     margin: 0;
     color: #333;
     font-weight: 300;
 }
 
 .error-message p {
-    font-size: 1.5rem;
+    font-size: var(--text-font);
     color: #666;
     margin-top: 0.5rem;
 }

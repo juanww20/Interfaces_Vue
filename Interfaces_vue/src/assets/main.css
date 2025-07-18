@@ -1338,7 +1338,7 @@ button[mat-button]:hover {
 
 ::ng-deep input.mat-input-element, 
 ::ng-deep textarea.mat-input-element {
-  font-size: 13px !important;
+  font-size: var(--text-font) !important;
   padding: 4px 0 !important;
   height: 28px !important;
   line-height: 1.2 !important;
@@ -1465,7 +1465,7 @@ map-btn {
   color: white;
   border: none;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: var(--text-font);
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.3s, box-shadow 0.3s;
@@ -1486,7 +1486,7 @@ map-btn {
 }
 
 .file-name {
-  font-size: 14px;
+  font-size: var(--text-font);
   color: #555;
   margin-left: 8px;
 }
@@ -1657,7 +1657,7 @@ COMPONENTE INPUTFIELD AUTH
 
 .form-field label {
   font-weight: 500;
-  color: var(--text-color, #333);
+  color: var(--dark-color);
   font-size: var(--text-font);
 }
 
