@@ -6,6 +6,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import { useAuthStore } from './stores/Auth'
+import { useStyleStore } from './stores/Styles'
 
 import 'jquery'
 import 'datatables.net-dt/css/dataTables.dataTables.css'
@@ -37,3 +38,8 @@ app.mount('#app')
 // ✅ Verifica la sesión al iniciar la app
 const auth = useAuthStore()
 auth.checkSession()
+
+const styleStore = useStyleStore()
+// ✅ Aplica el tema por defecto al iniciar la app
+styleStore.loadPaletteFromStorage()
+styleStore.loadFontFromStorage()
