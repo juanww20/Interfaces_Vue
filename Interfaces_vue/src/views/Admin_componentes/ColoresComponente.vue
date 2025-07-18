@@ -49,20 +49,19 @@
                 <div class="saved-styles">
                     <h3>Estilos guardados</h3>
                     <div id="savedStylesList" class="custom-scrollbar" >
-                        <div class="saved-style-item">
-                            <span>EU</span>
-                            <div class="color-preview">
-                                <div class="color-box" style="background-color: #3498db;"></div>
-                                <div class="color-box" style="background-color: #3498db;"></div>
-                                <div class="color-box" style="background-color: #3498db;"></div>
-                                <div class="color-box" style="background-color: #3498db;"></div>
-                                <div class="color-box" style="background-color: #3498db;"></div>
+                        <div v-for="palette in savedStylesColor" :key="palette.id" class="saved-style-item">
+                          <span>{{ palette.name }}</span>
+                          <div class="color-preview">
+                            <div v-for="(color, idx) in [palette.colors.color_one, palette.colors.color_two, palette.colors.color_three, palette.colors.color_four, palette.colors.color_five]" 
+                                :key="idx" class="color-box" 
+                                :style="{ backgroundColor: color }">
                             </div>
-                            <div class="style-actions">
-                                <button >✅ Aplicar</button>
-                                <button >✏️ Editar</button>
-                                <button >🗑️ Eliminar</button>
-                            </div>
+                          </div>
+                          <div class="style-actions">
+                            <button @click="applyColorPalette(palette)">✅ Aplicar</button>
+                            <button @click="handleEdit(palette)">✏️ Editar</button>
+                            <button @click="handleDeletePalette(palette.colors.colors_id)">🗑️ Eliminar</button>
+                          </div>
                         </div>
                     </div>
                 </div>
@@ -93,32 +92,166 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue'
+import Swal from 'sweetalert2'
+import { apiService } from '@/services/project_1/apiService'
+import { useStyleStore } from '@/stores/Styles'
 
-// Datos reactivos
-const headerBgColor = ref('#3498db');
-const titleColor = ref('#ffffff');
-const divBorderColor = ref('#95a5a6');
-const cardBgColor = ref('#2c3e50');
-const footerBgColor = ref('#ecf0f1');
-const titleFontSize = ref(24);
-const saveMode = ref('guardar');
+const styleStore = useStyleStore()
 
-// Métodos
+function handleApplyPalette(palette) {
+  styleStore.applyPalette(palette)
+}
+
+// Colores reactivos
+
+let headerBgColor = ref('')
+let titleColor = ref('')
+let divBorderColor = ref('')
+let cardBgColor = ref('')
+let footerBgColor = ref('')
+const titleFontSize = ref(32)
+
+function colorsReactive() {
+  
+  const saved = localStorage.getItem('activePalette')
+
+  if(saved){
+    const palette = JSON.parse(saved)
+    headerBgColor.value = palette.colors.color_one
+    titleColor.value = palette.colors.color_two
+    divBorderColor.value = palette.colors.color_three
+    cardBgColor.value = palette.colors.color_four
+    footerBgColor.value = palette.colors.color_five
+  } else {
+    headerBgColor.value = '#092db0'
+    titleColor.value = '#4B97F5'
+    divBorderColor.value = '#AED6F5'
+    cardBgColor.value = '#0D0D2E'
+    footerBgColor.value = '#FFFFFF'
+  }
+}
+
+colorsReactive();
+
+const saveMode = ref('guardar')
+const editingItem = ref(null)
+const savedStylesColor = ref([])
+const styleCounter = ref(1)
+
+// Estilos por defecto
+const defaultStyles = {
+  color_one: '#092db0',
+  color_two: '#4B97F5',
+  color_three: '#AED6F5',
+  color_four: '#0D0D2E',
+  color_five: '#FFFFFF',
+}
+
+// Cargar paletas al iniciar
+const fetchSavedStyles = async () => {
+  savedStylesColor.value = await apiService.getStyles()
+  styleCounter.value = savedStylesColor.value.length + 1
+}
+
+// Guardar o Editar
 const handleSaveOrEdit = () => {
-  saveMode.value = saveMode.value === 'guardar' ? 'editar' : 'guardar';
-  // Aquí podrías añadir lógica para guardar los estilos
-};
+  if (saveMode.value === 'guardar') {
+    saveCurrentStyle()
+  } else {
+    if (editingItem.value) {
+      handleSaveEdit(editingItem.value)
+    } else {
+      Swal.fire('Error', 'No hay paleta seleccionada para editar', 'error')
+    }
+  }
+}
+
+// Guardar nueva paleta
+const saveCurrentStyle = async () => {
+  const newStyle = {
+    name: `Paleta: ${styleCounter.value}`,
+    colors: {
+      color_one: headerBgColor.value,
+      color_two: titleColor.value,
+      color_three: divBorderColor.value,
+      color_four: cardBgColor.value,
+      color_five: footerBgColor.value
+    }
+  }
+
+  await apiService.createStyles(newStyle)
+  Swal.fire('¡Guardado!', 'La paleta ha sido guardada.', 'success')
+  await fetchSavedStyles()
+}
+
+// Editar paleta
+const handleEdit = (item) => {
+  editingItem.value = item
+  saveMode.value = 'editar'
+  headerBgColor.value = item.colors.color_one
+  titleColor.value = item.colors.color_two
+  divBorderColor.value = item.colors.color_three
+  cardBgColor.value = item.colors.color_four
+  footerBgColor.value = item.colors.color_five
+}
+
+const handleSaveEdit = async (item) => {
+  await apiService.updateColor(item.colors.colors_id, {
+    color_one: headerBgColor.value,
+    color_two: titleColor.value,
+    color_three: divBorderColor.value,
+    color_four: cardBgColor.value,
+    color_five: footerBgColor.value
+  })
+  saveMode.value = 'guardar'
+  editingItem.value = null
+  Swal.fire('Editado', 'La paleta fue actualizada.', 'success')
+  await fetchSavedStyles()
+}
 
 const resetStyles = () => {
-  headerBgColor.value = '#ffffff';
-  titleColor.value = '#000000';
-  divBorderColor.value = '#cccccc';
-  cardBgColor.value = '#f5f5f5';
-  footerBgColor.value = '#333333';
-  titleFontSize.value = 24;
-};
+  headerBgColor.value = defaultStyles.color_one
+  titleColor.value = defaultStyles.color_two
+  divBorderColor.value = defaultStyles.color_three
+  cardBgColor.value = defaultStyles.color_four
+  footerBgColor.value = defaultStyles.color_five
+
+  const pallete = {
+    colors: {
+      color_one: defaultStyles.color_one,
+      color_two: defaultStyles.color_two,
+      color_three: defaultStyles.color_three,
+      color_four: defaultStyles.color_four,
+      color_five: defaultStyles.color_five
+    }
+  }
+
+  Swal.fire('¡Estilos restablecidos!', '', 'success')
+
+  applyColorPalette(pallete);
+}
+
+const applyColorPalette = (palette) => {
+  headerBgColor.value = palette.colors.color_one
+  titleColor.value = palette.colors.color_two
+  divBorderColor.value = palette.colors.color_three
+  cardBgColor.value = palette.colors.color_four
+  footerBgColor.value = palette.colors.color_five
+
+  Swal.fire('¡Paleta aplicada!', '', 'success')
+  handleApplyPalette(palette)
+}
+
+const handleDeletePalette = async (id) => {
+  await apiService.deleteColors(id)
+  Swal.fire('Eliminado', 'La paleta fue eliminada.', 'success')
+  await fetchSavedStyles()
+}
+
+onMounted(fetchSavedStyles)
 </script>
+
 
 <style scoped>
 @import url('../Admin.css');
@@ -131,3 +264,5 @@ const resetStyles = () => {
   justify-content: center;
 }
 </style>
+
+
