@@ -10,15 +10,12 @@ export const apiService = {
   async getStyles() {
     try {
       const colors = await api.get('/color/')
-      const fonts = await api.get('/font/')
       console.log(colors.data.message)
-      return {
-        colors: colors.data.data,
-        fonts: fonts.data.data,
-      }
+      return colors.data.data
+      
     } catch (error) {
       console.error('Error al obtener la configuración por defecto:', error)
-      return false
+      return []
     }
   },
 
@@ -26,17 +23,16 @@ export const apiService = {
     try {
       const fonts = await api.get('/font/')
       console.log(fonts.data.message)
-      return { fonts: fonts.data.data }
+      return fonts.data.data
     } catch (error) {
       console.error('Error al obtener fuentes:', error)
-      return false
+      return []
     }
   },
 
   async createStyles(data: any) {
     try {
-      const color = data.moduleColor
-      const res = await api.post('/color/', color)
+      const res = await api.post('/color/', data)
       if (res) {
         console.log('Estilos creados:', res.data)
         return true
@@ -96,6 +92,16 @@ export const apiService = {
       return true
     } catch (error) {
       console.error('Error al actualizar fuente:', error)
+      return false
+    }
+  },
+
+  async updateFontFamily(id: string, data: any) {
+    try {
+      await api.patch(`/font/family/${id}`, data)
+      return true
+    } catch (error) {
+      console.error('Error al actualizar familia de fuente:', error)
       return false
     }
   },

@@ -44,6 +44,7 @@ export const useAuthStore = defineStore('auth', {
           return true
         }
       } catch (e) {
+        console.error('Session check error:', e)
         this.user = null
       }
       return false
