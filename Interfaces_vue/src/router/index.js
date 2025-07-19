@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '@/views/HomePage.vue'
 import AdminPage from '@/views/AdminPage.vue'
 import AuthPage from '@/views/AuthPage.vue'
+import PerfilComponente from '@/views/User_componentes/PerfilComponente.vue'
 import { useAuthStore } from '@/stores/Auth'
 import Error404Page from '@/views/Error_404Page.vue'
 
@@ -26,6 +27,15 @@ const router = createRouter({
       path: '/auth',
       name: 'auth',
       component: AuthPage
+     },
+     {
+      path: '/perfil',
+      name: 'perfil',
+      component: PerfilComponente,
+      meta: {
+        requiresAuth: true,
+        requiredRole: 'user'
+      }
      },
      {
       path: '/:pathMatch(.*)*',
