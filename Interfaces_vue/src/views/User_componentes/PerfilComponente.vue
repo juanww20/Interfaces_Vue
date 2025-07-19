@@ -2,7 +2,7 @@
     <main class="main-content">
         <section class="profile-section">
             <div class="avatar-container">
-                <img :src="ImagenPerfilTemporal" alt="eu" class="avatar">
+                <img :src="image" alt="eu" class="avatar">
             </div>
             
             <div class="info-card">
@@ -10,27 +10,77 @@
                 
                 <div class="info-item">
                     <span class="info-label">Nombre: </span>
-                    <span class="info-value">Paimon</span>
+                    <span class="info-value">{{firstName}}</span>
                 </div>
                 
                 <div class="info-item">
                     <span class="info-label">Teléfono: </span>
-                    <span class="info-value">4122555632</span>
+                    <span class="info-value">{{phone}}</span>
                 </div>
                 
                 <div class="info-item">
                     <span class="info-label">Correo: </span>
-                    <span class="info-value">EUpunto.com</span>
+                    <span class="info-value">{{ email }}</span>
                 </div>
                 
-                <button class="edit-btn"><a routerLink="/user">Editar</a></button>
+                <button class="edit-btn" @click="goToEdit">Editar</button>
             </div>
     </section>
 </main>
 </template>
 
 <script setup>
-import ImagenPerfilTemporal from '@/assets/img/logo.png'
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { userService } from '@/services/project_2/userService';
+
+const router = useRouter();
+
+const firstName = ref('');
+const phone = ref('');
+const email = ref('');
+const image = ref('');
+
+const goToEdit = () => {
+  router.push('/user-form');
+};
+
+const getUserID = () => {
+  try {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      return user.user_id || null;
+    }
+    return null;
+  } catch (error) {
+    console.log('Error fetching user ID:', error);
+    return null;
+  }
+};
+
+const getUserbyID = async (user_id) => {
+  try {
+    const result = await userService.getUserById(user_id);
+    return result;
+  } catch (error) {
+    console.error('Error fetching user by ID:', error);
+    return null;
+  }
+};
+
+onMounted(async () => {
+  const UserID = getUserID();
+  const data = await getUserbyID(UserID);
+  
+  if (data && data.data) {
+    firstName.value = data.data.firstName || '';
+    phone.value = data.data.phone || '';
+    email.value = data.data.email || '';
+    image.value = data.data.image || '';
+  }
+});
+
 </script>
 
 <style scoped>
