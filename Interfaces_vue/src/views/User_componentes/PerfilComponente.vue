@@ -42,7 +42,7 @@ const email = ref('');
 const image = ref('');
 
 const goToEdit = () => {
-  router.push('/user-form');
+  router.push('/editar_informacion');
 };
 
 const getUserID = () => {

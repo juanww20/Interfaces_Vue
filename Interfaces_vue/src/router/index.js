@@ -3,6 +3,7 @@ import HomePage from '@/views/HomePage.vue'
 import AdminPage from '@/views/AdminPage.vue'
 import AuthPage from '@/views/AuthPage.vue'
 import PerfilComponente from '@/views/User_componentes/PerfilComponente.vue'
+import PerfilEditarInformacion from '@/views/User_componentes/PerfilEditarInformacion.vue'
 import { useAuthStore } from '@/stores/Auth'
 import Error404Page from '@/views/Error_404Page.vue'
 
@@ -32,6 +33,15 @@ const router = createRouter({
       path: '/perfil',
       name: 'perfil',
       component: PerfilComponente,
+      meta: {
+        requiresAuth: true,
+        requiredRole: 'user'
+      }
+     },
+     {
+      path: '/editar_informacion',
+      name: 'editar',
+      component: PerfilEditarInformacion,
       meta: {
         requiresAuth: true,
         requiredRole: 'user'
