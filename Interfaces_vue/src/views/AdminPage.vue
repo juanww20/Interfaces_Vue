@@ -22,11 +22,19 @@
         >
             👤 Usuarios
         </button>
+        <button 
+            @click="activeTab = 'loaderconfig'" 
+            class="tab" 
+            :class="{ active: activeTab === 'loaderconfig' }"
+        >
+            ⏳ Loader
+        </button>
         </div>
 
         <ColorsPanel v-if="activeTab === 'colors'" />
         <TypographyPanel v-if="activeTab === 'typography'" />
         <UsersPanel v-if="activeTab === 'users'" />
+        <LoaderConfig v-if="activeTab === 'loaderconfig'" />
    </div>
 </template>
 
@@ -35,7 +43,7 @@ import { ref } from 'vue';
 import ColorsPanel from './Admin_componentes/ColoresComponente.vue';
 import TypographyPanel from './Admin_componentes/FuenteComponente.vue';
 import UsersPanel from './Admin_componentes/DatatableComponente.vue';
-
+import LoaderConfig from './Admin_componentes/LoaderConfig.vue';
 const activeTab = ref('colors'); // Valor inicial
 </script>
 
