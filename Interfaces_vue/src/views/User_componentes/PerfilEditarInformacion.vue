@@ -159,21 +159,25 @@
         <v-stepper-window-item :value="3">
           <v-form ref="form3" v-model="isStep3Valid" @submit.prevent="submitForm" class="step-form">
             <div class="name-fields">
-              <v-text-field label="Dirección" class="name-field"></v-text-field>
-              <v-text-field label="Ciudad" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Estado" outlined dense class="name-field"></v-text-field>
+              <v-btn type="button" color="primary" class="map-button" @click="showModal = true">
+                Seleccionar ubicación
+              </v-btn>
+              <MapModal v-if="showModal" @close="handleModalClose" />
+              <v-text-field v-model="formData.address" label="Dirección" class="name-field"></v-text-field>
+              <v-text-field v-model="formData.city" label="Ciudad" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.state" label="Estado" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="name-fields">
-              <v-text-field label="Código postal" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Código estado" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Latitud" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Longitud" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.postcode" label="Código postal" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.stateCode" label="Código estado" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.lat" label="Latitud" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.lng" label="Longitud" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="name-fields">
-              <v-text-field label="País" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Universidad" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.country" label="País" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.university" label="Universidad" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="form-actions">
@@ -189,17 +193,17 @@
         <v-stepper-window-item :value="4">
           <v-form ref="form3" v-model="isStep3Valid" @submit.prevent="submitForm" class="step-form">
             <div class="name-fields">
-              <v-text-field label="Vencimiento tarjeta" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Número de tarjeta" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Tipo de tarjeta" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Moneda" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.bank_cardExpire" label="Vencimiento tarjeta" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.bank_cardNumber" label="Número de tarjeta" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.bank_cardType" label="Tipo de tarjeta" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.bank_currency" label="Moneda" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="name-fields">
-              <v-text-field label="IBAN" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Criptomoneda" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Wallet" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Red cripto" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.bank_iban" label="IBAN" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.crypto_coin" label="Criptomoneda" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.crypto_wallet" label="Wallet" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.crypto_network" label="Red cripto" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="form-actions">
@@ -216,29 +220,32 @@
         <v-stepper-window-item :value="5">
           <v-form ref="form3" v-model="isStep3Valid" @submit.prevent="submitForm" class="step-form">
             <div class="name-fields">
-              <v-text-field label="Departamento" class="name-field"></v-text-field>
-              <v-text-field label="Empresa" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Cargo" outlined dense class="name-field"></v-text-field>
-
+              <v-btn type="button" color="primary" class="map-button" @click="showCompanyMapModal = true">
+                Seleccionar ubicación
+              </v-btn>
+              <MapModal v-if="showCompanyMapModal" @close="handleCompanyMapModalClose" />
+              <v-text-field v-model="formData.company_department" label="Departamento" class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_name" label="Empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_title" label="Cargo" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="name-fields">
-              <v-text-field label="Dirreción empresa" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Ciudad empresa" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Estado empresa" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Código estado empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_address_address" label="Dirreción empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_address_city" label="Ciudad empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_address_state" label="Estado empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_address_stateCode" label="Código estado empresa" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="name-fields">
-              <v-text-field label="Código postal empresa" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Latitud empresa" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Longitud empresa" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="País empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_address_postalCode" label="Código postal empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_address_coordinates_lat" label="Latitud empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_address_coordinates_lng" label="Longitud empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_address_country" label="País empresa" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="name-fields">
-              <v-text-field label="EIN" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="SSN" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.ein" label="EIN" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.ssn" label="SSN" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="form-actions">
@@ -287,7 +294,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
-
+import MapModal from '@/components/Map/MapModal.vue';
 //Esto sirve hacer la validacion, donde que permite tocar el boton de enviar con forma correcta, lea en la parte más abajo
 const currentStep = ref(1);
 const isStep1Valid = ref(false);
@@ -308,14 +315,60 @@ const form3 = ref(null);
 
 //Esto es donde el variable donde que se consigue todos los valores
 const formData = ref({
+  // Paso 1
   firstName: "",
   lastName: "",
+  maidenName: "",
   age: null,
-  gender: null,
+  gender: "",
+  birthDate: "",
+  bloodGroup: "",
+  height: "",
+  weight: "",
+  eyeColor: "",
+  hair_color: "",
+  hair_type: "",
+  image: "",
+  // Paso 2
   email: "",
   phone: "",
+  user_name: "",
+  ip: "",
+  macAddress: "",
+  userAgent: "",
+  // Paso 3
   address: "",
   city: "",
+  state: "",
+  stateCode: "",
+  postcode: "",
+  lat: "",
+  lng: "",
+  country: "",
+  university: "",
+  // Paso 4
+  bank_cardExpire: "",
+  bank_cardNumber: "",
+  bank_cardType: "",
+  bank_currency: "",
+  bank_iban: "",
+  crypto_coin: "",
+  crypto_wallet: "",
+  crypto_network: "",
+  // Paso 5
+  company_department: "",
+  company_name: "",
+  company_title: "",
+  company_address_address: "",
+  company_address_city: "",
+  company_address_state: "",
+  company_address_stateCode: "",
+  company_address_postalCode: "",
+  company_address_coordinates_lat: "",
+  company_address_coordinates_lng: "",
+  company_address_country: "",
+  ein: "",
+  ssn: ""
 });
 
 //Esto es para la seleccion multiple
@@ -496,6 +549,32 @@ const submitForm = async () => {
     currentStep.value = invalidStep;
   }
 };
+
+//Funcion para cerrar modal del mapa
+const showModal = ref(false)
+function handleModalClose(data) {
+  showModal.value = false
+  if (data) {
+    formData.value = { ...formData.value, ...data };
+    formData.value.address = data.adress || '';
+  }
+}
+
+// Modal para ubicación de empresa
+const showCompanyMapModal = ref(false)
+function handleCompanyMapModalClose(data) {
+  showCompanyMapModal.value = false
+  if (data) {
+    formData.value.company_address_address = data.adress || ''
+    formData.value.company_address_city = data.city || ''
+    formData.value.company_address_state = data.state || ''
+    formData.value.company_address_stateCode = data.stateCode || ''
+    formData.value.company_address_postalCode = data.postcode || ''
+    formData.value.company_address_coordinates_lat = data.lat || ''
+    formData.value.company_address_coordinates_lng = data.lng || ''
+    formData.value.company_address_country = data.country || ''
+  }
+}
 </script>
 
 <style scoped>
@@ -508,7 +587,7 @@ const submitForm = async () => {
 
 .custom-stepper {
   box-shadow: none;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--ligth-color);
   border-radius: 8px;
   padding: 20px;
 }
@@ -642,5 +721,13 @@ const submitForm = async () => {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+.map-button {
+  background-color: var(--primary-color);
+  color: var(--ligth-color);
+  font-size: 14px;
+  width: 20%;
+  height: auto;
 }
 </style>
