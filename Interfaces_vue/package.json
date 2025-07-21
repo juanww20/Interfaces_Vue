@@ -19,6 +19,7 @@
     "file-saver": "^2.0.5",
     "jquery": "^3.7.1",
     "jszip": "^3.10.1",
+    "leaflet": "^1.9.4",
     "pdfmake": "^0.2.20",
     "pinia": "^3.0.3",
     "sweetalert2": "^11.22.2",
