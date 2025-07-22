@@ -46,7 +46,7 @@
       error-message="Las contraseñas no coinciden."
     />
 
-    <button type="submit" class="auth-button">
+    <button type="submit" class="auth-button" style="color: var(--ligth-color);">
       {{ isLoginMode ? 'Iniciar Sesión' : 'Registrarse' }}
     </button>
   </form>

@@ -1707,8 +1707,8 @@ COMPONENTE AUTHFORM AUTH
 }
 
 .auth-button {
-  background-color: var(--primary-color);
   color: var(--ligth-color);
+  background-color: var(--primary-color);
   font-weight: 600;
   padding: 0.75rem;
   border: none;
@@ -1777,4 +1777,34 @@ VIEW AUTHPAGE AUTH
 .toggle-button:hover {
   background-color: var(--secondary-color);
   color: var(--ligth-color);
+}
+
+.dt-button.buttons-excel.buttons-html5.btn.btn-success {
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #10b68d;
+  border: none;
+  border-radius: 5px 5px 5px 5px;
+  font-weight: bold;
+  font-size: 16px;
+  color: #f8f9fa;
+}
+
+.dt-button.buttons-excel.buttons-html5.btn.btn-success:hover {
+  background-color: #018175;
+}
+
+.dt-button.buttons-pdf.buttons-html5.btn.btn-danger{
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #dc3545;
+  border: none;
+  border-radius: 5px 5px 5px 5px;
+  font-weight: bold;
+  font-size: 16px;
+  color: #f8f9fa;
+}
+
+.dt-button.buttons-pdf.buttons-html5.btn.btn-danger:hover{
+  background-color: #a94953;
 }

@@ -33,42 +33,51 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { userService } from '@/services/project_2/userService';
+import { useAuthStore } from '@/stores/Auth'; // Importar el store de autenticación
 
 const router = useRouter();
+const authStore = useAuthStore();
 
 const firstName = ref('');
 const phone = ref('');
 const email = ref('');
 const image = ref('');
+const isLoading = ref(true);
+const error = ref(null);
 
 const goToEdit = () => {
   router.push('/editar_informacion');
 };
 
-
-
-const getUserbyID = async (user_id) => {
-  try {
-    const result = await userService.getUserById(user_id);
-    return result;
-  } catch (error) {
-    console.error('Error fetching user by ID:', error);
-    return null;
-  }
-};
-
 onMounted(async () => {
-  const UserID = await userService.getUserID();
-  const data = await getUserbyID(UserID);
-  
-  if (data && data.data) {
-    firstName.value = data.data.firstName || '';
-    phone.value = data.data.phone || '';
-    email.value = data.data.email || '';
-    image.value = data.data.image || '';
+  try {
+    // Verificar si hay usuario autenticado
+    if (!authStore.isAuthenticated) {
+      const sessionValid = await authStore.checkSession();
+      if (!sessionValid) {
+        router.push('/login');
+        return;
+      }
+    }
+
+    // Obtener datos del usuario desde la API
+    const response = await userService.getUserById(authStore.user?.user_id);
+    
+    if (response && response.status) {
+      firstName.value = response.data.firstName || '';
+      phone.value = response.data.phone || '';
+      email.value = response.data.email || authStore.user?.email || '';
+      image.value = response.data.image || '';
+    } else {
+      throw new Error('No se pudieron obtener los datos del usuario');
+    }
+  } catch (err) {
+    console.error('Error al cargar datos del usuario:', err);
+    error.value = 'Error al cargar los datos del perfil';
+  } finally {
+    isLoading.value = false;
   }
 });
-
 </script>
 
 <style scoped>
