@@ -11,6 +11,19 @@
       />
     </div>
     <div class="form-group">
+      <label for="loaderSpeed">Velocidad de Loader (ms):</label>
+      <input
+        id="loaderSpeed"
+        type="range"
+        min="200"
+        max="900"
+        step="10"
+        v-model.number="tangramSpeed"
+        class="input-range"
+      />
+      <span class="range-value">{{ tangramSpeed }} ms</span>
+    </div>
+    <div class="form-group">
       <label for="loaderActive">Activar Loader:</label>
       <input
         id="loaderActive"
@@ -29,17 +42,21 @@ import Swal from 'sweetalert2';
 
 const durationSeconds = ref(6);
 const active = ref(true);
+const tangramSpeed = ref(400);
 
 // Cargar valores desde localStorage al iniciar
 onMounted(() => {
   const showLoader = localStorage.getItem('showLoader');
   const loaderTime = localStorage.getItem('loaderTime');
+  const tangramSpeedStorage = localStorage.getItem('tangramSpeed');
   try {
-    active.value = showLoader || true;
+    active.value = showLoader === null ? true : showLoader === 'true';
     // loaderTime está en ms, convertir a segundos para el input
     durationSeconds.value = loaderTime ? Math.round(JSON.parse(loaderTime) / 1000) : 6;
+    tangramSpeed.value = tangramSpeedStorage ? Number(tangramSpeedStorage) : 400;
   } catch {
     durationSeconds.value = 6;
+    tangramSpeed.value = 400;
   }
 });
 
@@ -57,6 +74,7 @@ const confirmSave = () => {
       // Guardar en localStorage (convertir a ms)
       localStorage.setItem('showLoader', active.value );
       localStorage.setItem('loaderTime', durationSeconds.value * 1000 );
+      localStorage.setItem('tangramSpeed', tangramSpeed.value || 400); // Valor por defecto de 400 ms
       Swal.fire('¡Guardado!', 'La configuración del loader ha sido guardada.', 'success');
     } else if (result.dismiss === Swal.DismissReason.cancel) {
       Swal.fire('Cancelado', 'No se guardó la configuración.', 'info');
@@ -102,6 +120,17 @@ const confirmSave = () => {
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 1rem;
+}
+.input-range {
+  width: 100%;
+  margin-top: 0.3rem;
+}
+.range-value {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2d3436;
 }
 .input-switch {
   width: 1.2rem;

@@ -11,7 +11,6 @@ import { ref, computed } from 'vue';
 // Definir los estilos de transform para cada paso
 const pasos = [
 
-
   // Paso 0 (figura1)
   {
     'triangulo-grande-1': {
@@ -83,7 +82,7 @@ const pasos = [
       transform: 'translate3d(-67px, 440px, 180px) rotateZ(48deg) rotateY(0deg)', zIndex: 7
     },
     'romboide': {
-      transform: 'translate3d(-175px, 550px, 300px) rotateZ(70deg) rotateY(0deg) rotateX(90deg)', zIndex: 7
+      transform: 'translate3d(-175px, 233px, 300px) rotateZ(70deg) rotateY(0deg) rotateX(90deg)', zIndex: 7
     },
     'cubo': {
       width: '100px', height: '100px', transform: 'translate3d(26px, 9px, 360px) rotateX(1deg) rotateY(0deg)', zIndex: 9
@@ -102,7 +101,7 @@ const pasos = [
       transform: 'translate3d(-90px, -132px, 235px) rotateX(-20deg) rotateY(0deg)', zIndex: 5
     },
     'triangulo-peque-1': {
-      transform: 'translate3d(-260px, 635px, 220px) rotateX(0deg) rotateZ(-133deg) rotateY(0deg)', zIndex: 6
+      transform: 'translate3d(-260px, 641px, 220px) rotateX(0deg) rotateZ(-133deg) rotateY(0deg)', zIndex: 6
     },
     'triangulo-peque-2': {
       transform: 'translate3d(-120px, 356px, 220px) rotateZ(48deg) rotateY(0deg)', zIndex: 7
@@ -115,7 +114,7 @@ const pasos = [
     }
   
   },
-
+ 
 
   // Paso Intermedio 1 (figura2 a figura3)
   {
@@ -127,7 +126,7 @@ const pasos = [
       transform: 'translate3d(-335px, 85px, 115px) rotate(0deg) rotateZ(0deg)', zIndex: 4
     },
     'triangulo-mediano': {
-      transform: 'translate3d(-90px, -132px, 280px) rotateX(-20deg) rotateY(0deg)', zIndex: 5
+      transform: 'translate3d(-300px, -132px, 280px) rotateX(-20deg) rotateY(0deg)', zIndex: 5
     },
     'triangulo-peque-1': {
       transform: 'translate3d(-260px, 635px, 180px) rotateX(0deg) rotateZ(-133deg) rotateY(0deg)', zIndex: 6
@@ -150,7 +149,7 @@ const pasos = [
       transform: 'translate3d(109px, 0px, 230px) rotateZ(-1deg)', zIndex: 3
     },
     'triangulo-grande-2': {
-      transform: 'translate3d(-388px, 18px, 115px) rotate(0deg) rotateZ(0deg)', zIndex: 4
+      transform: 'translate3d(-388px, 18px, 150px) rotate(0deg) rotateZ(0deg)', zIndex: 4
     },
     'triangulo-mediano': {
       transform: 'translate3d(25px, 533px, 280px) rotateX(20deg) rotateZ(179deg)', zIndex: 5
@@ -173,13 +172,13 @@ const pasos = [
   //Paso 3 Figura 3
   {
     'triangulo-grande-1': {
-      transform: 'translate3d(109px, 0px, 200px) rotateZ(-1deg)', zIndex: 3
+      transform: 'translate3d(109px, -2px, 215px) rotateZ(-1deg)', zIndex: 3
     },
     'triangulo-grande-2': {
-      transform: 'translate3d(-388px, 18px, 200px) rotate(0deg) rotateZ(0deg)', zIndex: 4
+      transform: 'translate3d(-388px, 18px, 180px) rotate(0deg) rotateZ(0deg)', zIndex: 4
     },
     'triangulo-mediano': {
-      transform: 'translate3d(25px, 533px, 235px) rotateX(20deg) rotateZ(179deg)', zIndex: 5
+      transform: 'translate3d(25px, 538px, 260px) rotateX(20deg) rotateZ(179deg)', zIndex: 5
     },
     'triangulo-peque-1': {
       transform: 'translate3d(3px, 202px, 220px) rotateX(0deg) rotateZ(-45deg) rotateY(0deg)', zIndex: 6
@@ -195,7 +194,30 @@ const pasos = [
     }
   },
 
-  
+  {
+    'triangulo-grande-1': {
+      transform: 'translate3d(109px, -2px, 200px) rotateZ(-1deg)', zIndex: 3
+    },
+    'triangulo-grande-2': {
+      transform: 'translate3d(-388px, 18px, 200px) rotate(0deg) rotateZ(0deg)', zIndex: 4
+    },
+    'triangulo-mediano': {
+      transform: 'translate3d(25px, 533px, 235px) rotateX(20deg) rotateZ(179deg)', zIndex: 5
+    },
+    'triangulo-peque-1': {
+      transform: 'translate3d(5px, 202px, 220px) rotateX(0deg) rotateZ(-45deg) rotateY(0deg)', zIndex: 6
+    },
+    'triangulo-peque-2': {
+      transform: 'translate3d(128px, 378px, 220px) rotateZ(136deg) rotateY(0deg)', zIndex: 7
+    },
+    'romboide': {
+      transform: 'translate3d(-138px, 437px, 220px) rotateZ(45deg) rotateY(180deg) rotateX(180deg)', zIndex: 7
+    },
+    'cubo': {
+      width: '100px', height: '100px', transform: 'translate3d(26px, 195px, 240px) rotateX(1deg) rotateZ(45deg) rotateY(0deg)', zIndex: 9
+    }
+  },
+
 
 
 ];
@@ -211,8 +233,16 @@ import { onMounted, onBeforeUnmount } from 'vue';
 let intervalId = null;
 function getTangramSpeed() {
   const speed = Number(localStorage.getItem('tangramSpeed'));
-  return isNaN(speed) || speed <= 0 ? 600 : speed;
+  console.log(`Tangram Speed: ${speed}ms`);
+  return isNaN(speed) || speed <= 0 ? 400 : speed;
 }
+
+const tangramTransition = computed(() => {
+  const speed = Number(localStorage.getItem('tangramSpeed'));
+  const seconds = (isNaN(speed) || speed <= 0 ? 400 : speed) / 1000;
+  console.log(`Transition Speed: ${seconds}s`);
+  return `${seconds}s`;
+});
 
 onMounted(() => {
   intervalId = setInterval(() => {
@@ -237,7 +267,7 @@ const estilos = computed(() => pasos[pasoActual.value]);
 
 <template>
   <div class="preview-container">
-    <div class="tangram-container">
+    <div class="tangram-container" :style="{ '--tangram-transition': tangramTransition }">
       <div class="pieza triangulo-grande-1" :style="estilos['triangulo-grande-1']"><TrianguloGrande_1 /></div>
       <div class="pieza triangulo-grande-2" :style="estilos['triangulo-grande-2']"><TrianguloGrande_2 /></div>
       <div class="pieza triangulo-mediano" :style="estilos['triangulo-mediano']"><TrianguloMediano /></div>
@@ -285,7 +315,7 @@ body, html {
   height: 100px; /* Ajusta según tamaño real */
   box-sizing: border-box;
   border: 1px solid transparent; /* para debugging, pon rojo para probar */
-  transition: transform 0.6s cubic-bezier(.77,0,.18,1), z-index 1s;
+  transition: transform var(--tangram-transition, 0.4s) cubic-bezier(.77,0,.18,1), z-index 1s;
 }
 /* Los transform y z-index ahora se manejan por binding en el template */
 </style>
