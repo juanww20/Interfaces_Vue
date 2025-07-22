@@ -56,7 +56,7 @@ const config = {
 .carousel {
   --vc-pgn-background-color: var(--ligth-color);
   --vc-pgn-active-color: var(--primary-color);
-  --vc-nav-background: var(--secondary-color);
+  --vc-nav-background: var(--secondary-color); /*--vc-nav-background esta es el color esa background de btn redondo*/
   --vc-nav-border-radius: 100%;
 }
 
