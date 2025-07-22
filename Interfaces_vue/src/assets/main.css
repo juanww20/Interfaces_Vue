@@ -1707,8 +1707,8 @@ COMPONENTE AUTHFORM AUTH
 }
 
 .auth-button {
-  background-color: var(--primary-color);
   color: var(--ligth-color);
+  background-color: var(--primary-color);
   font-weight: 600;
   padding: 0.75rem;
   border: none;
