@@ -57,7 +57,6 @@ onMounted(() => {
       );
       if (!response.ok) throw new Error('Error en la respuesta de Nominatim');
       const data = await response.json();
-      console.log('Datos obtenidos de Nominatim:', data);
       adress = data.name || data.address?.quarter || data.address?.neighbourhood || data.address?.suburb || '';
       state = data.address?.state || '';
       postcode = data.address?.postcode || '';
@@ -65,9 +64,6 @@ onMounted(() => {
       city = data.address?.city || data.address?.county || '';
       university = data.address?.amenity || '';
 
-      currentMarker = L.marker([lat, lng]).addTo(map)
-        .bindPopup(`Marcador en:<br>Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}<br>País: ${country}<br>Ciudad: ${city}`)
-        .openPopup();
       const ubication_data = {
         adress,
         state,

@@ -45,19 +45,7 @@ const goToEdit = () => {
   router.push('/editar_informacion');
 };
 
-const getUserID = () => {
-  try {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      return user.user_id || null;
-    }
-    return null;
-  } catch (error) {
-    console.log('Error fetching user ID:', error);
-    return null;
-  }
-};
+
 
 const getUserbyID = async (user_id) => {
   try {
@@ -70,7 +58,7 @@ const getUserbyID = async (user_id) => {
 };
 
 onMounted(async () => {
-  const UserID = getUserID();
+  const UserID = await userService.getUserID();
   const data = await getUserbyID(UserID);
   
   if (data && data.data) {

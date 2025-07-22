@@ -17,6 +17,7 @@ export const useAuthStore = defineStore('auth', {
             ...res.data,
             role: res.data.role?.name || res.data.role,
           }
+          localStorage.setItem('user', JSON.stringify(this.user))
           return true
         }
       } catch (e) {
@@ -30,6 +31,7 @@ export const useAuthStore = defineStore('auth', {
     async logout() {
       await userService.logout()
       this.user = null
+      localStorage.removeItem('user')
     },
 
     async checkSession() {

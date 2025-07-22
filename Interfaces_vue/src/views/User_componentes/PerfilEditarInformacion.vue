@@ -95,7 +95,7 @@
 
             <!-- Sección de imagen -->
             <div class="image-section">
-              <v-text-field v-model="formData.imageUrl" label="URL de imagen" outlined dense
+              <v-text-field v-model="formData.image" label="URL de imagen" outlined dense
                 @update:modelValue="updateImagePreview" class="url-field"></v-text-field>
 
               <div class="imagen-input-preview-row">
@@ -130,20 +130,20 @@
           <v-form ref="form2" v-model="isStep2Valid" @submit.prevent="nextStep" class="step-form">
 
             <div class="name-fields">
-              <v-text-field label="Correo Electrónico" :rules="emailRules" outlined dense
+              <v-text-field v-model="formData.email" label="Correo Electrónico" :rules="emailRules" outlined dense
                 :error-messages="submitAttempted && !formData.email ? ['Campo obligatorio'] : []"
                 class="name-field"></v-text-field>
               <!--Revisa este campo, piensa donde coloca mejor-->
-              <v-text-field v-model="formData.hair_type" label="Contraseña" :rules="hairTypeRules" outlined dense
+              <v-text-field v-model="formData.password" label="Contraseña" :rules="hairTypeRules" outlined dense
                 maxlength="15" class="name-field"></v-text-field>
-              <v-text-field label="Telefono" :rules="phoneRules" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="Usuario" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="IP" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.phone" label="Telefono" :rules="phoneRules" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.user_name" label="Usuario" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.ip" label="IP" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="name-fields">
-              <v-text-field label="MAC Address" outlined dense class="name-field"></v-text-field>
-              <v-text-field label="User Agent" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.macAddress" label="MAC Address" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.userAgent" label="User Agent" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="form-actions">
@@ -157,27 +157,27 @@
 
         <!-- Paso 3: Direccion -->
         <v-stepper-window-item :value="3">
-          <v-form ref="form3" v-model="isStep3Valid" @submit.prevent="submitForm" class="step-form">
+          <v-form ref="form3" v-model="isStep3Valid" @submit.prevent="nextStep" class="step-form">
             <div class="name-fields">
               <v-btn type="button" color="primary" class="map-button" @click="showModal = true">
                 Seleccionar ubicación
               </v-btn>
               <MapModal v-if="showModal" @close="handleModalClose" />
-              <v-text-field v-model="formData.address" label="Dirección" class="name-field"></v-text-field>
-              <v-text-field v-model="formData.city" label="Ciudad" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.state" label="Estado" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.address_address" label="Dirección" class="name-field"></v-text-field>
+              <v-text-field v-model="formData.address_city" :rules="addressCityRules" label="Ciudad" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.address_state" :rules="addressStateRules" label="Estado" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="name-fields">
-              <v-text-field v-model="formData.postcode" label="Código postal" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.stateCode" label="Código estado" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.lat" label="Latitud" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.lng" label="Longitud" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.address_postalCode" :rules="addressPostalCodeRules" label="Código postal" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.address_stateCode" :rules="addressStateCodeRules" label="Código estado" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.address_coordinates_lat" :rules="addressCoordinatesLatRules" label="Latitud" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.address_coordinates_lng" :rules="addressCoordinatesLngRules" label="Longitud" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="name-fields">
-              <v-text-field v-model="formData.country" label="País" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.university" label="Universidad" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.address_country" :rules="addressCountryRules" label="País" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.university" :rules="universityRules" label="Universidad" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="form-actions">
@@ -191,19 +191,19 @@
 
         <!-- Paso 4: Banco y cripto -->
         <v-stepper-window-item :value="4">
-          <v-form ref="form3" v-model="isStep3Valid" @submit.prevent="submitForm" class="step-form">
+          <v-form ref="form4"  @submit.prevent="nextStep" class="step-form">
             <div class="name-fields">
-              <v-text-field v-model="formData.bank_cardExpire" label="Vencimiento tarjeta" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.bank_cardNumber" label="Número de tarjeta" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.bank_cardType" label="Tipo de tarjeta" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.bank_currency" label="Moneda" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.bank_cardExpire" :rules="bankCardExpireRules" label="Vencimiento tarjeta" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.bank_cardNumber" :rules="bankCardNumberRules" label="Número de tarjeta" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.bank_cardType" :rules="bankCardTypeRules" label="Tipo de tarjeta" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.bank_currency" :rules="bankCurrencyRules" label="Moneda" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="name-fields">
-              <v-text-field v-model="formData.bank_iban" label="IBAN" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.crypto_coin" label="Criptomoneda" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.crypto_wallet" label="Wallet" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.crypto_network" label="Red cripto" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.bank_iban" :rules="bankIbanRules" label="IBAN" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.crypto_coin" :rules="cryptoCoinRules" label="Criptomoneda" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.crypto_wallet" :rules="cryptoWalletRules" label="Wallet" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.crypto_network" :rules="cryptoNetworkRules" label="Red cripto" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="form-actions">
@@ -218,34 +218,34 @@
 
         <!-- Paso 5: Datos empresariales -->
         <v-stepper-window-item :value="5">
-          <v-form ref="form3" v-model="isStep3Valid" @submit.prevent="submitForm" class="step-form">
+          <v-form ref="form5"  @submit.prevent="nextStep" class="step-form">
             <div class="name-fields">
               <v-btn type="button" color="primary" class="map-button" @click="showCompanyMapModal = true">
                 Seleccionar ubicación
               </v-btn>
               <MapModal v-if="showCompanyMapModal" @close="handleCompanyMapModalClose" />
-              <v-text-field v-model="formData.company_department" label="Departamento" class="name-field"></v-text-field>
-              <v-text-field v-model="formData.company_name" label="Empresa" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.company_title" label="Cargo" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_department" :rules="companyDepartmentRules" label="Departamento" class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_name" :rules="companyNameRules" label="Empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_title" :rules="companyTitleRules" label="Cargo" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="name-fields">
-              <v-text-field v-model="formData.company_address_address" label="Dirreción empresa" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.company_address_city" label="Ciudad empresa" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.company_address_state" label="Estado empresa" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.company_address_stateCode" label="Código estado empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_address_address" :rules="companyAddressAddressRules" label="Dirreción empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_address_city" :rules="companyAddressCityRules" label="Ciudad empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_address_state" :rules="companyAddressStateRules" label="Estado empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_address_stateCode" :rules="companyAddressStateCodeRules" label="Código estado empresa" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="name-fields">
-              <v-text-field v-model="formData.company_address_postalCode" label="Código postal empresa" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.company_address_coordinates_lat" label="Latitud empresa" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.company_address_coordinates_lng" label="Longitud empresa" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.company_address_country" label="País empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_address_postalCode" :rules="companyAddressPostalCodeRules" label="Código postal empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_address_coordinates_lat" :rules="companyAddressCoordinatesLatRules" label="Latitud empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_address_coordinates_lng" :rules="companyAddressCoordinatesLngRules" label="Longitud empresa" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.company_address_country" :rules="companyAddressCountryRules" label="País empresa" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="name-fields">
-              <v-text-field v-model="formData.ein" label="EIN" outlined dense class="name-field"></v-text-field>
-              <v-text-field v-model="formData.ssn" label="SSN" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.ein" :rules="einRules" label="EIN" outlined dense class="name-field"></v-text-field>
+              <v-text-field v-model="formData.ssn" :rules="ssnRules" label="SSN" outlined dense class="name-field"></v-text-field>
             </div>
 
             <div class="form-actions">
@@ -260,12 +260,7 @@
 
         <!--Final paso: Confirmación, OJO, esto no deberia quedarse así-->
         <v-stepper-window-item :value="6">
-          <v-form ref="form3" v-model="isStep3Valid" @submit.prevent="submitForm" class="step-form">
-            <v-text-field v-model="formData.address" label="Dirección*" :rules="addressRules" outlined dense
-              :error-messages="submitAttempted && !formData.address ? ['Campo obligatorio'] : []"></v-text-field>
-
-            <v-text-field v-model="formData.city" label="Ciudad" :rules="cityRules" outlined dense></v-text-field>
-
+          <v-form ref="form6" v-model="isStep3Valid" @submit.prevent="submitForm" class="step-form">
             <!-- Mensaje de error global -->
             <div v-if="submitAttempted && allMissingRequiredFields.length > 0" class="error-message">
               <v-icon color="error">mdi-alert-circle</v-icon>
@@ -293,25 +288,43 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import Swal from 'sweetalert2';
 import MapModal from '@/components/Map/MapModal.vue';
+import { userService } from "@/services/project_2/userService";
 //Esto sirve hacer la validacion, donde que permite tocar el boton de enviar con forma correcta, lea en la parte más abajo
 const currentStep = ref(1);
-const isStep1Valid = ref(false);
-const isStep2Valid = ref(false);
-const isStep3Valid = ref(false);
+const isStep1Valid = ref(true);
+const isStep2Valid = ref(true);
+const isStep3Valid = ref(true);
 const submitAttempted = ref(false);
+
 
 //Imagen de la ruta?? 
 const imagePreviewUrl = ref(null);
+const userID = ref(null);
+// Cargar datos del usuario al iniciar
+async function loadUserData() {
+  userID.value = await userService.getUserID();
+  if (!userID.value) return;
+  const res = await userService.getUserById(userID.value);
+  console.log('User data fetched:', res);
+  if (res && res.status && res.data) {
+    // Asigna los datos recibidos al formData (ajusta según la estructura de tu backend)
+    Object.assign(formData.value, res.data);
+  }
+}
+
+onMounted(() => {
+  loadUserData();
+});
 
 const form1 = ref(null);
 const form2 = ref(null);
 const form3 = ref(null);
-//Aqui esta comentada para que pueda agregar otros campos
-// const form4 = ref(null);
-// const form5 = ref(null);
-// const form6 = ref(null);
+const form4 = ref(null);
+const form5 = ref(null);
+const form6 = ref(null);
 
 //Esto es donde el variable donde que se consigue todos los valores
 const formData = ref({
@@ -331,20 +344,21 @@ const formData = ref({
   image: "",
   // Paso 2
   email: "",
+  password: "",
   phone: "",
   user_name: "",
   ip: "",
   macAddress: "",
   userAgent: "",
   // Paso 3
-  address: "",
-  city: "",
-  state: "",
-  stateCode: "",
-  postcode: "",
-  lat: "",
-  lng: "",
-  country: "",
+  address_address: "",
+  address_city: "",
+  address_state: "",
+  address_stateCode: "",
+  address_postalCode: "",
+  address_coordinates_lat: "",
+  address_coordinates_lng: "",
+  address_country: "",
   university: "",
   // Paso 4
   bank_cardExpire: "",
@@ -377,22 +391,18 @@ const genders = ["Masculino", "Femenino", "Otro", "No especificar"];
 // Campos obligatorios para el mensaje de error
 const requiredFields = {
   1: ['firstName', 'lastName', 'age', 'gender'],
-  2: ['email'],
-  3: ['address']
 };
 
 //Vea bien este codigo, aqui es hacer la validacion que donde el campo obligatorio se lo pide de forma obligatorio, y esto tambien sirve
 //que marca cuales son los campos en un mensaje.
 const missingRequiredFields = computed(() => {
-  const fields = requiredFields[currentStep.value];
+  const fields = requiredFields[currentStep.value] || [];
   return fields.filter(field => !formData.value[field]).map(field => {
     const labels = {
       'firstName': 'Nombre',
       'lastName': 'Apellido',
       'age': 'Edad',
       'gender': 'Género',
-      'email': 'Correo electrónico',
-      'address': 'Dirección'
     };
     return labels[field];
   });
@@ -410,17 +420,36 @@ const phoneRules = [
   (v) => !v || v.length <= 11 || "Máximo 11 dígitos",
 ];
 
-const addressRules = [(v) => !!v || "Campo obligatorio"];
-const cityRules = [];
 
 // Navegación entre pasos
 const nextStep = async () => {
   submitAttempted.value = true;
-  const form = currentStep.value === 1 ? form1.value : form2.value;
+  // Selecciona el ref del formulario correspondiente al paso actual
+  let form = null;
+  switch (currentStep.value) {
+    case 1:
+      form = form1.value;
+      break;
+    case 2:
+      form = form2.value;
+      break;
+    case 3:
+      form = form3.value;
+      break;
+    case 4:
+      form = form4.value;
+      break;
+    case 5:
+      form = form5.value;
+      break;
+    default:
+      form = null;
+  }
+  if (!form) return;
   const { valid } = await form.validate();
-
   if (valid) {
-    if (currentStep.value < 3) currentStep.value += 1;
+    // Avanza al siguiente paso si no es el último (6 es confirmación)
+    if (currentStep.value < 6) currentStep.value += 1;
   }
 };
 
@@ -496,27 +525,147 @@ const hairTypeRules = [
   v => !v || v.length <= 15 || "Máximo 15 caracteres"
 ];
 
+// Reglas paso 2
+const addressCityRules = [
+  (v) => !v || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$/.test(v) || "Solo letras permitidas",
+  v => (!v || v.length >= 2) || "Mínimo 2 caracteres",
+  v => (!v || v.length <= 40) || "Máximo 40 caracteres"
+];
+const addressStateRules = [
+  (v) => !v || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$/.test(v) || "Solo letras permitidas",
+  v => (!v || v.length >= 2) || "Mínimo 2 caracteres",
+  v => (!v || v.length <= 40) || "Máximo 40 caracteres"
+];
+const addressStateCodeRules = [
+  (v) => !v || /^[a-zA-Z0-9]+$/.test(v) || "Solo letras y números permitidos",
+  v => (!v || v.length >= 2) || "Mínimo 2 caracteres",
+  v => (!v || v.length <= 15) || "Máximo 15 caracteres"
+];
+const addressPostalCodeRules = [
+  (v) => !v || /^[0-9]+$/.test(v) || "Solo números permitidos",
+  v => (!v || v.length >= 2) || "Mínimo 2 caracteres",
+  v => (!v || v.length <= 15) || "Máximo 15 caracteres"
+];
+const addressCoordinatesLatRules = [
+  (v) => !v || /^-?\d{1,2}\.\d+$/.test(v) || "Formato de latitud inválido"
+
+];
+const addressCoordinatesLngRules = [
+  (v) => !v || /^-?\d{1,3}\.\d+$/.test(v) || "Formato de longitud inválido"
+];
+const addressCountryRules = [
+  (v) => !v || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$/.test(v) || "Solo letras permitidas"
+];
+const universityRules = [
+  v => !v || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$/.test(v) || "Solo letras permitidas",
+  v => !v || v.length >= 2 || "Mínimo 2 caracteres",
+  v => !v || v.length <= 40 || "Máximo 40 caracteres"
+];
+
+// Reglas de validación para paso 4: Banco y Cripto
+const bankCardExpireRules = [
+  v => !v || /^(0[1-9]|1[0-2])\/(\d{2}|\d{4})$/.test(v) || "Formato MM/AA o MM/AAAA"
+];
+const bankCardNumberRules = [
+  v => !v || /^\d{12,19}$/.test(v.replace(/\s/g, '')) || "Debe tener entre 12 y 19 dígitos"
+];
+const bankCardTypeRules = [
+  v => !v || v.length <= 20 || "Máximo 20 caracteres"
+];
+const bankCurrencyRules = [
+  v => !v || /^[A-Z]{3}$/.test(v) || "Debe ser un código de moneda (ej: USD)"
+];
+const bankIbanRules = [
+  v => !v || /^[A-Z]{2}\d{2}[A-Z0-9]{1,30}$/.test(v.replace(/\s/g, '')) || "Formato IBAN inválido"
+];
+const cryptoCoinRules = [
+  v => !v || v.length <= 20 || "Máximo 20 caracteres"
+];
+const cryptoWalletRules = [
+  v => !v || v.length <= 60 || "Máximo 60 caracteres"
+];
+const cryptoNetworkRules = [
+  v => !v || v.length <= 30 || "Máximo 30 caracteres"
+];
+
+const companyDepartmentRules = [
+  v => !v || v.length <= 40 || "Máximo 40 caracteres"
+];
+const companyNameRules = [
+  v => !v || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9 .,&-]+$/.test(v) || "Solo letras, números y algunos símbolos",
+  v => !v || v.length <= 60 || "Máximo 60 caracteres"
+];
+const companyTitleRules = [
+  v => !v || v.length <= 40 || "Máximo 40 caracteres"
+];
+const companyAddressAddressRules = [
+  v => !v || v.length <= 80 || "Máximo 80 caracteres"
+];
+const companyAddressCityRules = [
+  v => !v || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$/.test(v) || "Solo letras permitidas",
+  v => !v || v.length <= 40 || "Máximo 40 caracteres"
+];
+const companyAddressStateRules = [
+  v => !v || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$/.test(v) || "Solo letras permitidas",
+  v => !v || v.length <= 40 || "Máximo 40 caracteres"
+];
+const companyAddressStateCodeRules = [
+  v => !v || /^[a-zA-Z0-9]+$/.test(v) || "Solo letras y números permitidos",
+  v => !v || v.length <= 15 || "Máximo 15 caracteres"
+];
+const companyAddressPostalCodeRules = [
+  v => !v || /^[0-9]+$/.test(v) || "Solo números permitidos",
+  v => !v || v.length <= 15 || "Máximo 15 caracteres"
+];
+const companyAddressCoordinatesLatRules = [
+  v => !v || /^-?\d{1,2}\.\d+$/.test(v) || "Formato de latitud inválido"
+];
+const companyAddressCoordinatesLngRules = [
+  v => !v || /^-?\d{1,3}\.\d+$/.test(v) || "Formato de longitud inválido"
+];
+const companyAddressCountryRules = [
+  v => !v || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$/.test(v) || "Solo letras permitidas"
+];
+const einRules = [
+  v => !v || /^[0-9-]+$/.test(v) || "Solo números y guiones",
+  v => !v || v.length <= 15 || "Máximo 15 caracteres"
+];
+const ssnRules = [
+  v => !v || /^[0-9-]+$/.test(v) || "Solo números y guiones",
+  v => !v || v.length <= 15 || "Máximo 15 caracteres"
+];
+
 // Manejo de archivos
 const onFileSelected = (event) => {
   const file = event.target.files[0];
   if (file) {
     formData.value.imageFile = file;
     imagePreviewUrl.value = URL.createObjectURL(file);
+    // Convertir a base64
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      formData.value.imageBase64 = e.target.result;
+      formData.value.image = e.target.result; // Limpiar URL si se selecciona un archivo
+    };
+
+    reader.readAsDataURL(file);
   }
 };
 
 
 // Nueva computed property para todos los campos faltantes
 const allMissingRequiredFields = computed(() => {
-  const allFields = [...requiredFields[1], ...requiredFields[2], ...requiredFields[3]];
+  const allFields = [
+    ...(requiredFields[1] || []),
+    ...(requiredFields[2] || []),
+    ...(requiredFields[3] || [])
+  ];
   return allFields.filter(field => !formData.value[field]).map(field => {
     const labels = {
       'firstName': 'Nombre (Paso 1)',
       'lastName': 'Apellido (Paso 1)',
       'age': 'Edad (Paso 1)',
       'gender': 'Género (Paso 1)',
-      'email': 'Correo electrónico (Paso 2)',
-      'address': 'Dirección (Paso 3)'
     };
     return labels[field];
   });
@@ -531,18 +680,35 @@ const submitForm = async () => {
   submitAttempted.value = true;
 
   // Validar todos los formularios
-  const validatePromises = [
-    form1.value.validate(),
-    form2.value.validate(),
-    form3.value.validate()
-  ];
+  const validatePromises = [form1.value, form2.value, form3.value]
+    .filter(f => f)
+    .map(f => f.validate());
 
   const results = await Promise.all(validatePromises);
   const allValid = results.every(result => result.valid);
 
   if (allValid) {
-    console.log("Formulario enviado:", formData.value);
-    // Lógica para enviar datos (API, etc.)
+    const result = await Swal.fire({
+      title: '¿Está seguro de actualizar sus datos?',
+      text: 'Esta acción actualizará la información de su perfil.',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, actualizar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    });
+    if (result.isConfirmed) {
+      // Aquí va la lógica para enviar datos (API, etc.)
+      const filteredData = Object.fromEntries(
+        // eslint-disable-next-line no-unused-vars
+        Object.entries(formData.value).filter(([_, v]) => v !== "" && v !== null && v !== undefined)
+      );
+      console.log("Formulario a enviar:", filteredData);
+      await userService.updateUser(userID.value, filteredData);
+      Swal.fire('Actualizado', 'Sus datos han sido actualizados.', 'success');
+    } else {
+      Swal.fire('Cancelado', 'No se realizaron cambios.', 'info');
+    }
   } else {
     // Encontrar el primer paso con errores
     const invalidStep = results.findIndex(result => !result.valid) + 1;
@@ -555,8 +721,15 @@ const showModal = ref(false)
 function handleModalClose(data) {
   showModal.value = false
   if (data) {
-    formData.value = { ...formData.value, ...data };
-    formData.value.address = data.adress || '';
+    formData.value.address_address = data.adress || ''
+    formData.value.address_city = data.city || ''
+    formData.value.address_state = data.state || ''
+    formData.value.address_stateCode = data.stateCode || ''
+    formData.value.address_postalCode = data.postcode || ''
+    formData.value.address_coordinates_lat = data.lat || ''
+    formData.value.address_coordinates_lng = data.lng || ''
+    formData.value.address_country = data.country || ''
+    formData.value.university = data.university || ''
   }
 }
 
