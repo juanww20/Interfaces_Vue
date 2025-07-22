@@ -94,9 +94,9 @@ onMounted(async () => {
 .profile-section {
     display: flex;
     width: 100%;
-    background: white;
+    background: var(--light-color);
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 10px var(--dark-color);
     overflow: hidden;
 }
 
@@ -107,8 +107,8 @@ onMounted(async () => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: #f8f9fa;
-    border-right: 1px solid #eee;
+    background-color: var(--light-color);
+    border-right: 1px solid var(--dark-color);
 }
 
 .avatar {
@@ -116,8 +116,8 @@ onMounted(async () => {
     height: 200px;
     border-radius: 50%;
     object-fit: contain;
-    border: 5px solid white;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    border: 5px solid var(--light-color);
+    box-shadow: 0 3px 10px var(--dark-color);
     margin-bottom: 1.5rem;
 }
 
@@ -130,7 +130,7 @@ onMounted(async () => {
 .info-title {
     font-size: 1.8rem;
     margin-bottom: 1.5rem;
-    color: #2c3e50;
+    color: var(--dark-color);
     font-weight: 600;
 }
 
@@ -143,21 +143,21 @@ onMounted(async () => {
 .info-label {
     font-weight: 600;
     width: 100px;
-    color: #7f8c8d;
+    color: var(--dark-color);
 }
 
 .info-value {
     flex: 1;
     padding: 0.5rem 0;
-    border-bottom: 1px solid #ecf0f1;
+    border-bottom: 1px solid var(--dark-color);
 }
 
 .edit-btn {
     position: absolute;
     bottom: 2.5rem;
     right: 2.5rem;
-    background-color: #3498db;
-    color: white;
+    background-color: var(--primary-color);
+    color: var(--light-color);
     border: none;
     padding: 0.8rem 1.5rem;
     border-radius: 4px;
@@ -167,8 +167,8 @@ onMounted(async () => {
 }
 
 .edit-btn:hover {
-    background-color: #2980b9;
+    background-color: var(--primary-dark-color);
     transform: translateY(-2px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px var(--dark-color);
 }
 </style>

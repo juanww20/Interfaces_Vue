@@ -1,9 +1,9 @@
 <template>
   <div class="form-container">
     <!-- Stepper con puntos -->
-    <v-stepper v-model="currentStep" alt-labels class="custom-stepper">
-      <v-stepper-header>
-        <v-stepper-item :value="1" editable @click="currentStep = 1">
+    <v-stepper style="background: var(--light-color); box-shadow: none; color:var(--dark-color)" v-model="currentStep" alt-labels class="custom-stepper">
+      <v-stepper-header style="background: var(--light-color); box-shadow: none; color:var(--dark-color)">
+        <v-stepper-item style="color: var(--dark-color); font-size: var(--text-font); background: var(--light-color);" :value="1" editable @click="currentStep = 1">
           <template #title>Datos personales</template>
         </v-stepper-item>
 
@@ -113,12 +113,21 @@
 
             <!-- Botón Siguiente corregido -->
             <div class="form-actions">
-              <v-btn type="submit" color="primary" class="next-btn" :disabled="!isStep1Valid" :loading="isSubmitting">
-                Siguiente
-                <template v-slot:loader>
-                  <v-progress-circular indeterminate size="24"></v-progress-circular>
-                </template>
-              </v-btn>
+              <button
+                type="submit"
+                class="next-btn"
+                :disabled="!isStep1Valid || isSubmitting"
+                :style="`background: var(--primary-color); color: var(--light-color); border: none; padding: 8px 24px; border-radius: 4px; min-width: 120px; cursor: pointer; position: relative;`"
+              >
+                <span v-if="!isSubmitting">Siguiente</span>
+                <span v-else style="display: flex; align-items: center; justify-content: center;">
+                  <svg style="margin: 0 auto;" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="white" stroke-width="4" stroke-linecap="round" stroke-dasharray="60" stroke-dashoffset="40">
+                      <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite" />
+                    </circle>
+                  </svg>
+                </span>
+              </button>
             </div>
           </v-form>
         </v-stepper-window-item>
@@ -147,10 +156,10 @@
             </div>
 
             <div class="form-actions">
-              <v-btn type="button" @click="currentStep = 1" text class="back-btn"> Atrás </v-btn>
-              <v-btn type="submit" color="primary" class="next-btn" :disabled="!isStep2Valid">
+              <button type="button" @click="currentStep = 1" class="back-btn"> Atrás </button>
+              <button style="background: var(--primary-color); color: var(--light-color);" type="submit" class="next-btn" :disabled="!isStep2Valid">
                 Siguiente
-              </v-btn>
+              </button>
             </div>
           </v-form>
         </v-stepper-window-item>
@@ -159,9 +168,9 @@
         <v-stepper-window-item :value="3">
           <v-form ref="form3" v-model="isStep3Valid" @submit.prevent="nextStep" class="step-form">
             <div class="name-fields">
-              <v-btn type="button" color="primary" class="map-button" @click="showModal = true">
+              <button type="button" color="primary" class="map-button" @click="showModal = true">
                 Seleccionar ubicación
-              </v-btn>
+              </button>
               <MapModal v-if="showModal" @close="handleModalClose" />
               <v-text-field v-model="formData.address_address" label="Dirección" class="name-field"></v-text-field>
               <v-text-field v-model="formData.address_city" :rules="addressCityRules" label="Ciudad" outlined dense class="name-field"></v-text-field>
@@ -181,10 +190,10 @@
             </div>
 
             <div class="form-actions">
-              <v-btn type="button" @click="currentStep = 2" text class="back-btn"> Atrás </v-btn>
-              <v-btn type="submit" color="primary" class="next-btn">
+              <button type="button" @click="currentStep = 2" class="back-btn"> Atrás </button>
+              <button type="submit" color="primary" class="next-btn">
                 Siguiente
-              </v-btn>
+              </button>
             </div>
           </v-form>
         </v-stepper-window-item>
@@ -207,10 +216,10 @@
             </div>
 
             <div class="form-actions">
-              <v-btn type="button" @click="currentStep = 3" text class="back-btn"> Atrás </v-btn>
-              <v-btn type="submit" color="primary" class="next-btn">
+              <button type="button" @click="currentStep = 3" text class="back-btn"> Atrás </button>
+              <button type="submit" color="primary" class="next-btn">
                 Siguiente
-              </v-btn>
+              </button>
             </div>
           </v-form>
         </v-stepper-window-item>
@@ -220,9 +229,9 @@
         <v-stepper-window-item :value="5">
           <v-form ref="form5"  @submit.prevent="nextStep" class="step-form">
             <div class="name-fields">
-              <v-btn type="button" color="primary" class="map-button" @click="showCompanyMapModal = true">
+              <button type="button" class="map-button" @click="showCompanyMapModal = true">
                 Seleccionar ubicación
-              </v-btn>
+              </button>
               <MapModal v-if="showCompanyMapModal" @close="handleCompanyMapModalClose" />
               <v-text-field v-model="formData.company_department" :rules="companyDepartmentRules" label="Departamento" class="name-field"></v-text-field>
               <v-text-field v-model="formData.company_name" :rules="companyNameRules" label="Empresa" outlined dense class="name-field"></v-text-field>
@@ -249,10 +258,10 @@
             </div>
 
             <div class="form-actions">
-              <v-btn type="button" @click="currentStep = 4" text class="back-btn"> Atrás </v-btn>
-              <v-btn type="submit" color="primary" class="next-btn">
+              <button type="button" @click="currentStep = 4" text class="back-btn"> Atrás </button>
+              <button type="submit" color="primary" class="next-btn">
                 Siguiente
-              </v-btn>
+              </button>
             </div>
 
           </v-form>
@@ -273,10 +282,10 @@
             </div>
 
             <div class="form-actions">
-              <v-btn type="button" @click="currentStep = 5" text class="back-btn"> Atrás </v-btn>
-              <v-btn type="submit" color="primary" class="submit-btn" :disabled="!allStepsValid">
+              <button type="button" @click="currentStep = 5" text class="back-btn"> Atrás </button>
+              <button type="submit" color="primary" class="submit-btn" :disabled="!allStepsValid">
                 Enviar
-              </v-btn>
+              </button>
             </div>
           </v-form>
         </v-stepper-window-item>
@@ -603,7 +612,7 @@ const companyAddressAddressRules = [
 ];
 const companyAddressCityRules = [
   v => !v || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$/.test(v) || "Solo letras permitidas",
-  v => !v || v.length <= 40 || "Máximo 40 caracteres"
+  v => !v || v.length <= 40 || "Máximo 40 caracteres" 
 ];
 const companyAddressStateRules = [
   v => !v || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$/.test(v) || "Solo letras permitidas",
@@ -638,18 +647,29 @@ const ssnRules = [
 // Manejo de archivos
 const onFileSelected = (event) => {
   const file = event.target.files[0];
-  if (file) {
-    formData.value.imageFile = file;
-    imagePreviewUrl.value = URL.createObjectURL(file);
-    // Convertir a base64
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      formData.value.imageBase64 = e.target.result;
-      formData.value.image = e.target.result; // Limpiar URL si se selecciona un archivo
-    };
-
-    reader.readAsDataURL(file);
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Archivo no válido',
+      text: 'Por favor selecciona solo archivos de imagen.',
+    });
+    event.target.value = '';
+    formData.value.imageFile = null;
+    formData.value.imageBase64 = '';
+    formData.value.image = '';
+    imagePreviewUrl.value = null;
+    return;
   }
+  formData.value.imageFile = file;
+  imagePreviewUrl.value = URL.createObjectURL(file);
+  // Convertir a base64
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    formData.value.imageBase64 = e.target.result;
+    formData.value.image = e.target.result; // Limpiar URL si se selecciona un archivo
+  };
+  reader.readAsDataURL(file);
 };
 
 
@@ -756,11 +776,14 @@ function handleCompanyMapModalClose(data) {
   height: auto;
   margin: 0 auto;
   padding: 20px;
+  font-size: var(--text-font);
 }
+
 
 .custom-stepper {
   box-shadow: none;
-  border: 1px solid var(--ligth-color);
+  background-color: var(--light-color);
+  border: 1px solid var(--light-color);
   border-radius: 8px;
   padding: 20px;
 }
@@ -779,6 +802,7 @@ function handleCompanyMapModalClose(data) {
 }
 
 .form-actions {
+  background-color: var(--light-color);;
   display: flex;
   justify-content: flex-end;
   gap: 16px;
@@ -796,7 +820,7 @@ function handleCompanyMapModalClose(data) {
 
 .error-message {
   color: #ff5252;
-  background-color: #ffebee;
+  background-color: var(--light-color);
   padding: 12px;
   border-radius: 4px;
   margin-bottom: 16px;
@@ -808,14 +832,19 @@ function handleCompanyMapModalClose(data) {
 /* Estilos para los campos */
 :deep(.v-text-field) {
   margin-bottom: 16px;
+  font-size: var(--text-font);
 }
 
 :deep(.v-input__control) {
   min-height: 48px;
+  font-size: var(--text-font);
+
 }
 
 :deep(.v-label) {
   font-size: 14px;
+  font-size: var(--text-font);
+
 }
 
 :deep(.v-label--required::after) {
@@ -873,7 +902,7 @@ function handleCompanyMapModalClose(data) {
 
 .preview-image {
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--light-color);
 }
 
 .form-actions {
@@ -896,11 +925,56 @@ function handleCompanyMapModalClose(data) {
   }
 }
 
+button{
+  font-size: var(--text-font);
+}
+
+.next-btn .back-btn {
+  border-radius: 8px;
+  padding: 8px 16px;
+  background-color: var(--primary-color);
+  color: var(--ligth-color);
+  background: var(--primary-color);
+  font-size: var(--text-font);
+}
+
 .map-button {
   background-color: var(--primary-color);
   color: var(--ligth-color);
-  font-size: 14px;
+  font-size: var(--text-font);
+  border-radius: 10px;
   width: 20%;
   height: auto;
+}
+
+.v-stepper .v-sheet {
+  background-color: var(--light-color);
+  background: var(--light-color);
+  color: var(--dark-color);
+  border: 1px solid var(--light-color);
+  font-size: var(--text-font);
+  box-shadow: none;
+}
+
+input{
+  background-color: var(--light-color);
+
+}
+
+:deep(.v-stepper-item__avatar.v-avatar) {
+  background-color: var(--primary-color) !important;
+  color: var(--light-color) !important;
+}
+
+:deep(.v-field__input) {
+  font-size: var(--text-font) !important;
+}
+
+:deep(.v-field-label) {
+  font-size: var(--text-font) !important;
+}
+
+:deep(.v-messages__message) {
+  font-size: var(--text-font) !important;
 }
 </style>
