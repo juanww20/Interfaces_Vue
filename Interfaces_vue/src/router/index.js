@@ -1,13 +1,57 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import HomePage from '@/views/HomePage.vue'
+import AdminPage from '@/views/AdminPage.vue'
+import AuthPage from '@/views/AuthPage.vue'
+import PerfilComponente from '@/views/User_componentes/PerfilComponente.vue'
+import PerfilEditarInformacion from '@/views/User_componentes/PerfilEditarInformacion.vue'
+import { useAuthStore } from '@/stores/Auth'
+import Error404Page from '@/views/Error_404Page.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // {
-    //   path: '/',
-    //   name: 'home',
-    //   component: HomeView,
-    // },
+     {
+       path: '/',
+       name: 'home',
+       component: HomePage,
+     },
+     {
+      path:'/administrador',
+      name:'administrador',
+      component:AdminPage,
+      meta: {
+        requiresAuth: true,
+        requiredRole: 'admin'
+      }
+     },
+     {
+      path: '/auth',
+      name: 'auth',
+      component: AuthPage
+     },
+     {
+      path: '/perfil',
+      name: 'perfil',
+      component: PerfilComponente,
+      meta: {
+        requiresAuth: true,
+        requiredRole: 'user'
+      }
+     },
+     {
+      path: '/editar_informacion',
+      name: 'editar',
+      component: PerfilEditarInformacion,
+      meta: {
+        requiresAuth: true,
+        requiredRole: 'user'
+      }
+     },
+     {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: Error404Page
+    }
     // {
     //   path: '/about',
     //   name: 'about',
@@ -18,5 +62,29 @@ const router = createRouter({
     // },
   ],
 })
+
+// 🔐 Protección de rutas
+router.beforeEach(async (to, from, next) => {
+  const auth = useAuthStore()
+
+  // Si no hay usuario en memoria, intenta verificar sesión con backend
+  if (!auth.user && to.meta.requiresAuth) {
+    const valid = await auth.checkSession()
+    if (!valid) return next({ name: 'auth' })
+  }
+
+  // Redirige si no está autenticado
+  if (to.meta.requiresAuth && !auth.isAuthenticated) {
+    return next({ name: 'auth' })
+  }
+
+  // Verifica rol si se especifica en meta
+  if (to.meta.requiredRole && auth.user?.role !== to.meta.requiredRole) {
+    return next({ name: 'home' }) // o página 403
+  }
+
+  next()
+})
+
 
 export default router

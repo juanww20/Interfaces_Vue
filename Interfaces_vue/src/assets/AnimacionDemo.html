@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animación de Cubos que se Unen</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #f0f0f0;
+            perspective: 1000px;
+        }
+
+        .button-container {
+            margin-bottom: 50px;
+        }
+
+        .trigger-button {
+            padding: 12px 24px;
+            font-size: 18px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .trigger-button:hover {
+            background: #2980b9;
+        }
+
+        .trigger-button:focus {
+            outline: none;
+        }
+
+        /* Ocultamos el checkbox que usaremos como trigger */
+        #animation-trigger {
+            display: none;
+        }
+
+        /* Cuando el checkbox está checked, activamos la animación */
+        #animation-trigger:checked ~ .scene-container .cube-1 {
+            animation: move-up-join 2s forwards;
+        }
+
+        #animation-trigger:checked ~ .scene-container .cube-2 {
+            animation: move-up-join 2s forwards;
+        }
+
+        #animation-trigger:checked ~ .scene-container .merged-cube {
+            animation: fade-in-scale 2s 2s forwards;
+            opacity: 0;
+        }
+
+        .scene-container {
+            position: relative;
+            height: 300px;
+            width: 400px;
+        }
+
+        .cube {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            transform-style: preserve-3d;
+            transition: all 0.5s;
+        }
+
+        .cube-1 {
+            left: 50px;
+            bottom: 50px;
+            transform: rotateX(20deg) rotateY(20deg);
+        }
+
+        .cube-2 {
+            right: 50px;
+            bottom: 50px;
+            transform: rotateX(-20deg) rotateY(-20deg);
+        }
+
+        .merged-cube {
+            left: 50%;
+            top: 50px;
+            transform: translateX(-50%) rotateX(0) rotateY(0) scale(0.5);
+            opacity: 0;
+            z-index: 10;
+        }
+
+        .face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: white;
+            opacity: 0.9;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        /* Colores de las caras para cubo 1 */
+        .cube-1 .front { background: rgba(231, 76, 60, 0.9); transform: translateZ(50px); }
+        .cube-1 .back { background: rgba(230, 126, 34, 0.9); transform: rotateY(180deg) translateZ(50px); }
+        .cube-1 .right { background: rgba(241, 196, 15, 0.9); transform: rotateY(90deg) translateZ(50px); }
+        .cube-1 .left { background: rgba(46, 204, 113, 0.9); transform: rotateY(-90deg) translateZ(50px); }
+        .cube-1 .top { background: rgba(52, 152, 219, 0.9); transform: rotateX(90deg) translateZ(50px); }
+        .cube-1 .bottom { background: rgba(155, 89, 182, 0.9); transform: rotateX(-90deg) translateZ(50px); }
+
+        /* Colores de las caras para cubo 2 */
+        .cube-2 .front { background: rgba(52, 152, 219, 0.9); transform: translateZ(50px); }
+        .cube-2 .back { background: rgba(155, 89, 182, 0.9); transform: rotateY(180deg) translateZ(50px); }
+        .cube-2 .right { background: rgba(46, 204, 113, 0.9); transform: rotateY(90deg) translateZ(50px); }
+        .cube-2 .left { background: rgba(241, 196, 15, 0.9); transform: rotateY(-90deg) translateZ(50px); }
+        .cube-2 .top { background: rgba(230, 126, 34, 0.9); transform: rotateX(90deg) translateZ(50px); }
+        .cube-2 .bottom { background: rgba(231, 76, 60, 0.9); transform: rotateX(-90deg) translateZ(50px); }
+
+        /* Colores de las caras para el cubo fusionado */
+        .merged-cube .front { background: rgba(142, 68, 173, 0.9); transform: translateZ(50px); }
+        .merged-cube .back { background: rgba(39, 174, 96, 0.9); transform: rotateY(180deg) translateZ(50px); }
+        .merged-cube .right { background: rgba(41, 128, 185, 0.9); transform: rotateY(90deg) translateZ(50px); }
+        .merged-cube .left { background: rgba(211, 84, 0, 0.9); transform: rotateY(-90deg) translateZ(50px); }
+        .merged-cube .top { background: rgba(243, 156, 18, 0.9); transform: rotateX(90deg) translateZ(50px); }
+        .merged-cube .bottom { background: rgba(192, 57, 43, 0.9); transform: rotateX(-90deg) translateZ(50px); }
+
+        /* Animaciones */
+        @keyframes move-up-join {
+            0% {
+                transform: translateY(0) rotateX(20deg) rotateY(20deg);
+            }
+            50% {
+                transform: translateY(-150px) rotateX(0) rotateY(0);
+            }
+            100% {
+                transform: translateY(-100px) rotateX(0) rotateY(0);
+            }
+        }
+
+        @keyframes fade-in-scale {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) scale(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(-50%) scale(1);
+            }
+        }
+
+        /* Estructura de los cubos (caras) */
+        .cube div:nth-child(1) { transform-style: preserve-3d; }
+    </style>
+</head>
+<body>
+    <input type="checkbox" id="animation-trigger">
+    
+    <div class="button-container">
+        <label for="animation-trigger" class="trigger-button">Unir Cubos</label>
+    </div>
+
+    <div class="scene-container">
+        <!-- Primer cubo -->
+        <div class="cube cube-1">
+            <div class="face front">1</div>
+            <div class="face back">1</div>
+            <div class="face right">1</div>
+            <div class="face left">1</div>
+            <div class="face top">1</div>
+            <div class="face bottom">1</div>
+        </div>
+
+        <!-- Segundo cubo -->
+        <div class="cube cube-2">
+            <div class="face front">2</div>
+            <div class="face back">2</div>
+            <div class="face right">2</div>
+            <div class="face left">2</div>
+            <div class="face top">2</div>
+            <div class="face bottom">2</div>
+        </div>
+
+        <!-- Cubo fusionado (inicialmente oculto) -->
+        <div class="cube merged-cube">
+            <div class="face front">❤</div>
+            <div class="face back">❤</div>
+            <div class="face right">❤</div>
+            <div class="face left">❤</div>
+            <div class="face top">❤</div>
+            <div class="face bottom">❤</div>
+        </div>
+    </div>
+</body>
+</html>

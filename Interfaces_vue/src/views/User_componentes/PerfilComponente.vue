@@ -1,0 +1,174 @@
+<template>
+    <main class="main-content">
+        <section class="profile-section">
+            <div class="avatar-container">
+                <img :src="image" alt="eu" class="avatar">
+            </div>
+            
+            <div class="info-card">
+                <h2 class="info-title">Información perfil personal</h2>
+                
+                <div class="info-item">
+                    <span class="info-label">Nombre: </span>
+                    <span class="info-value">{{firstName}}</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">Teléfono: </span>
+                    <span class="info-value">{{phone}}</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">Correo: </span>
+                    <span class="info-value">{{ email }}</span>
+                </div>
+                
+                <button class="edit-btn" @click="goToEdit">Editar</button>
+            </div>
+    </section>
+</main>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { userService } from '@/services/project_2/userService';
+import { useAuthStore } from '@/stores/Auth'; // Importar el store de autenticación
+
+const router = useRouter();
+const authStore = useAuthStore();
+
+const firstName = ref('');
+const phone = ref('');
+const email = ref('');
+const image = ref('');
+const isLoading = ref(true);
+const error = ref(null);
+
+const goToEdit = () => {
+  router.push('/editar_informacion');
+};
+
+onMounted(async () => {
+  try {
+    // Verificar si hay usuario autenticado
+    if (!authStore.isAuthenticated) {
+      const sessionValid = await authStore.checkSession();
+      if (!sessionValid) {
+        router.push('/login');
+        return;
+      }
+    }
+
+    // Obtener datos del usuario desde la API
+    const response = await userService.getUserById(authStore.user?.user_id);
+    
+    if (response && response.status) {
+      firstName.value = response.data.firstName || '';
+      phone.value = response.data.phone || '';
+      email.value = response.data.email || authStore.user?.email || '';
+      image.value = response.data.image || '';
+    } else {
+      throw new Error('No se pudieron obtener los datos del usuario');
+    }
+  } catch (err) {
+    console.error('Error al cargar datos del usuario:', err);
+    error.value = 'Error al cargar los datos del perfil';
+  } finally {
+    isLoading.value = false;
+  }
+});
+</script>
+
+<style scoped>
+.main-content {
+    display: flex;
+    flex: 1;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    gap: 2rem;
+}
+
+.profile-section {
+    display: flex;
+    width: 100%;
+    background: var(--light-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px var(--dark-color);
+    overflow: hidden;
+}
+
+.avatar-container {
+    width: 35%;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--light-color);
+    border-right: 1px solid var(--dark-color);
+}
+
+.avatar {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: contain;
+    border: 5px solid var(--light-color);
+    box-shadow: 0 3px 10px var(--dark-color);
+    margin-bottom: 1.5rem;
+}
+
+.info-card {
+    width: 65%;
+    padding: 2.5rem;
+    position: relative;
+}
+
+.info-title {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: var(--dark-color);
+    font-weight: 600;
+}
+
+.info-item {
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+}
+
+.info-label {
+    font-weight: 600;
+    width: 100px;
+    color: var(--dark-color);
+}
+
+.info-value {
+    flex: 1;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--dark-color);
+}
+
+.edit-btn {
+    position: absolute;
+    bottom: 2.5rem;
+    right: 2.5rem;
+    background-color: var(--primary-color);
+    color: var(--light-color);
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.edit-btn:hover {
+    background-color: var(--primary-dark-color);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px var(--dark-color);
+}
+</style>
