@@ -29,12 +29,28 @@
         >
             ⏳ Loader
         </button>
+        <button 
+            @click="activeTab = 'fotoseditar'" 
+            class="tab" 
+            :class="{ active: activeTab === 'fotoseditar' }"
+        >
+            📷 Fotos
+        </button>
+        <button 
+            @click="activeTab = 'videoseditar'" 
+            class="tab" 
+            :class="{ active: activeTab === 'videoseditar' }"
+        >
+            🎥 Videos
+        </button>
         </div>
 
         <ColorsPanel v-if="activeTab === 'colors'" />
         <TypographyPanel v-if="activeTab === 'typography'" />
         <UsersPanel v-if="activeTab === 'users'" />
         <LoaderConfig v-if="activeTab === 'loaderconfig'" />
+        <FotosEditar v-if="activeTab === 'fotoseditar'" />
+        <VideosEditar v-if="activeTab === 'videoseditar'"/>
    </div>
 </template>
 
@@ -44,6 +60,9 @@ import ColorsPanel from './Admin_componentes/ColoresComponente.vue';
 import TypographyPanel from './Admin_componentes/FuenteComponente.vue';
 import UsersPanel from './Admin_componentes/DatatableComponente.vue';
 import LoaderConfig from './Admin_componentes/LoaderConfig.vue';
+import FotosEditar from './Admin_componentes/FotosEditar.vue';
+import VideosEditar from './Admin_componentes/VideosEditar.vue';
+
 const activeTab = ref('colors'); // Valor inicial
 </script>
 
