@@ -4,9 +4,11 @@ import cookieParser from "cookie-parser";
 import {sequelize} from "./config/dataBase.js";
 import { enviroment } from "./config/enviroment.js";
 import { routerApi } from "./api/v1/route.js";
-import dotenv from "dotenv";
-import { FontFamily, Font } from "./models/tables.js"
-dotenv.config()
+import path from 'path';
+import fs from 'fs';
+import { UPLOADS_DIR } from './utils/global-path.js'; // Import global path variables
+
+const __dirname = UPLOADS_DIR;
 
 const app = express();
 
@@ -41,9 +43,37 @@ app.use(cors({
   credentials: true,
 }));
 
+app.use('/images', express.static(path.join(__dirname, 'uploads', 'images')));
+
+app.get('/preview-image/:filename', (req, res) => {
+  const { filename } = req.params;
+  const fullPath = path.join(__dirname, 'uploads', 'images', filename);
+
+  // Mostrar ruta absoluta y si existe el archivo
+  console.log('📂 Ruta absoluta:', fullPath);
+  console.log('📦 Existe imagen:', fs.existsSync(fullPath));
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <title>Vista previa de imagen</title>
+    </head>
+    <body>
+      <h1>Imagen cargada:</h1>
+      <img src="/images/${filename}" alt="Imagen subida" style="max-width: 400px; border: 1px solid #ccc;" />
+      <p>Ruta: <code>/images/${filename}</code></p>
+    </body>
+    </html>
+  `;
+
+  res.send(html);
+});
 
 // api
 app.use('/api/v1/', routerApi);
+
 
 
 async function main() {
