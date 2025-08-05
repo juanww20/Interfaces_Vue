@@ -1808,3 +1808,7 @@ VIEW AUTHPAGE AUTH
 .dt-button.buttons-pdf.buttons-html5.btn.btn-danger:hover{
   background-color: #a94953;
 }
+
+.form label{
+  font-size: var(--text-font);
+}

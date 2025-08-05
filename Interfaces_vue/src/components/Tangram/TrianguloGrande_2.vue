@@ -65,7 +65,7 @@ export default {
 .face.front {
   width: 290px;
   height: 148px;
-  background-color: #e20a9a;
+  background-color: var(--primary-color);
   clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
   transform: translateZ(50px) translateY(30px);
 }
@@ -74,7 +74,7 @@ export default {
 .face.back {
   width: 290px;
   height: 148px;
-  background-color: #e20a9a;
+  background-color: var(--primary-color);
   clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
   transform: rotateY(180deg) translateY(30px) translateZ(-30px);
 }
@@ -84,7 +84,7 @@ export default {
 .face.bottom {
   width: 290px;
   height: 20px;
-  background-color: #a50b72;
+  background-color: var(--primary-color);
   clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
   transform: rotateX(90deg) translateY(30px) translateZ(-177px);
   transform-origin: top;
@@ -94,7 +94,7 @@ export default {
 .face.left {
   width: 50px;
   height: 300px;
-  background-color: #a50b72;
+  background-color: var(--primary-color);
   clip-path: polygon(0% 0%, 40% 0%, 41% 70%, 0% 70%);
   transform: rotateY(90deg) translateY(-53px) rotateX(-44.5deg) translateX(-50px) translateZ(56px);
   transform-origin: left;
@@ -104,7 +104,7 @@ export default {
 .face.right {
   width: 50px;
   height: 235px;
-  background-color: #a50b72;
+  background-color: var(--primary-color);
   clip-path: polygon(0% 0%, 40% 0%, 40% 90%, 0% 90%);
   transform: rotateY(90deg) translateY(168px) rotateX(44.5deg) translateX(0px) translateZ(247px);
 
