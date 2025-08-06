@@ -1,42 +1,9 @@
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import { UPLOADS_DIR } from '../../utils/global-path.js';
-
-const __dirname = UPLOADS_DIR;
-
-const imageUploadPath = path.join(__dirname, 'uploads', 'images');
-
-if (!fs.existsSync(imageUploadPath)) {
-  fs.mkdirSync(imageUploadPath, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, imageUploadPath);
-  },
-  filename: function (req, file, cb) {
-    const timestamp = Date.now();
-    
-    // 1. Extraer nombre sin extensión y sanitizar
-    const originalName = path.parse(file.originalname).name;
-    const sanitizedName = originalName
-      .toLowerCase()
-      .replace(/\s+/g, '-')           // reemplaza espacios por guiones
-      .replace(/[^a-z0-9\-]/g, '');   // elimina caracteres especiales
-
-    // 2. Extraer extensión
-    const extension = path.extname(file.originalname).toLowerCase();
-
-    // 3. Concatenar todo
-    const uniqueName = `${timestamp}-${sanitizedName}${extension}`;
-    cb(null, uniqueName);
-  }
-});
+import { get_upload_path } from "../../utils/uploads_files.js";
 
 // Validaciones: tipo y tamaño
 export const uploadImage = multer({
-  storage,
+  storage: get_upload_path('uploads', 'images'),
   limits: { fileSize: 1024 * 1024 * 150 }, // 150MB
   fileFilter: (req, file, cb) => {
     const allowed = ['image/jpeg', 'image/png', 'image/webp'];
