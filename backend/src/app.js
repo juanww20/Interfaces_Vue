@@ -45,16 +45,19 @@ app.use(cors({
 
 app.use('/images', express.static(path.join(__dirname, 'uploads', 'images')));
 app.use('/videos', express.static(path.join(__dirname, 'uploads', 'videos')));
+app.use('/audios', express.static(path.join(__dirname, 'uploads', 'audios')));
 
 app.get('/preview-image/:filename', (req, res) => {
   const { filename } = req.params;
   const fullPath = path.join(__dirname, 'uploads', 'images', filename);
   const fullPathVideos = path.join(__dirname, 'uploads', 'videos', filename);
+  const fullPathAudios = path.join(__dirname, 'uploads', 'audios', filename);
 
   // Mostrar ruta absoluta y si existe el archivo
   console.log('📂 Ruta absoluta:', fullPath);
   console.log('📦 Existe imagen:', fs.existsSync(fullPath));
   console.log('📦 Existe video:', fs.existsSync(fullPathVideos));
+  console.log('📦 Existe audio:', fs.existsSync(fullPathAudios));
 
   const html = `
     <!DOCTYPE html>
@@ -71,6 +74,10 @@ app.get('/preview-image/:filename', (req, res) => {
       <video controls style="max-width: 400px; border: 1px solid #ccc;">
         <source src="/videos/${filename}" type="video/mp4">
       </video>
+      <h2>Audio cargado:</h2>
+      <audio controls style="max-width: 400px; border: 1px solid #ccc;">
+        <source src="/audios/${filename}" type="audio/mpeg">
+      </audio>
     </body>
     </html>
   `;
