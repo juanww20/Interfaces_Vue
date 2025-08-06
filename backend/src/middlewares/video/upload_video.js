@@ -1,3 +1,4 @@
+// middlewares/uploadVideo.js
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
@@ -5,19 +6,16 @@ import { UPLOADS_DIR } from '../../utils/global-path.js';
 
 const __dirname = UPLOADS_DIR;
 
-const imageUploadPath = path.join(__dirname, 'uploads', 'images');
-
-if (!fs.existsSync(imageUploadPath)) {
-  fs.mkdirSync(imageUploadPath, { recursive: true });
+const videoUploadPath = path.join(__dirname, 'uploads', 'videos');
+if (!fs.existsSync(videoUploadPath)) {
+  fs.mkdirSync(videoUploadPath, { recursive: true });
 }
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, imageUploadPath);
-  },
-  filename: function (req, file, cb) {
+  destination: (req, file, cb) => cb(null, videoUploadPath),
+  filename: (req, file, cb) => {
     const timestamp = Date.now();
-    
+
     // 1. Extraer nombre sin extensión y sanitizar
     const originalName = path.parse(file.originalname).name;
     const sanitizedName = originalName
@@ -34,13 +32,12 @@ const storage = multer.diskStorage({
   }
 });
 
-// Validaciones: tipo y tamaño
-export const uploadImage = multer({
+export const uploadVideo = multer({
   storage,
-  limits: { fileSize: 1024 * 1024 * 150 }, // 150MB
+  limits: { fileSize: 1024 * 1024 * 500 }, // 500MB max
   fileFilter: (req, file, cb) => {
-    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+    const allowed = ['video/mp4', 'video/mkv', 'video/webm'];
     if (allowed.includes(file.mimetype)) cb(null, true);
-    else cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', file));
+    else cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', 'Invalid file type, only MP4, MKV, and WEBM are allowed'));
   }
 });
