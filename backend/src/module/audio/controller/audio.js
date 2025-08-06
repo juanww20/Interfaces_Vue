@@ -1,10 +1,9 @@
 import { ModelAudio } from "../model/audio.js";
-import { validateAudio, validateAudioUpdate } from "../validation/validation.js"
+import { validateAudio, validateAudioUpdate } from "../../../helper/validation.js"
 import { parseFile } from "music-metadata"
 import path from "path";
 import fs from 'fs';
 import { UPLOADS_DIR } from "../../../utils/global-path.js";
-import e from "express";
 
 const __dirname = UPLOADS_DIR;
 
