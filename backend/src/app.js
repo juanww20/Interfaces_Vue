@@ -44,14 +44,17 @@ app.use(cors({
 }));
 
 app.use('/images', express.static(path.join(__dirname, 'uploads', 'images')));
+app.use('/videos', express.static(path.join(__dirname, 'uploads', 'videos')));
 
 app.get('/preview-image/:filename', (req, res) => {
   const { filename } = req.params;
   const fullPath = path.join(__dirname, 'uploads', 'images', filename);
+  const fullPathVideos = path.join(__dirname, 'uploads', 'videos', filename);
 
   // Mostrar ruta absoluta y si existe el archivo
   console.log('📂 Ruta absoluta:', fullPath);
   console.log('📦 Existe imagen:', fs.existsSync(fullPath));
+  console.log('📦 Existe video:', fs.existsSync(fullPathVideos));
 
   const html = `
     <!DOCTYPE html>
@@ -64,6 +67,10 @@ app.get('/preview-image/:filename', (req, res) => {
       <h1>Imagen cargada:</h1>
       <img src="/images/${filename}" alt="Imagen subida" style="max-width: 400px; border: 1px solid #ccc;" />
       <p>Ruta: <code>/images/${filename}</code></p>
+      <h2>Video cargado:</h2>
+      <video controls style="max-width: 400px; border: 1px solid #ccc;">
+        <source src="/videos/${filename}" type="video/mp4">
+      </video>
     </body>
     </html>
   `;
