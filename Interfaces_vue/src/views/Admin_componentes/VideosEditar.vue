@@ -2,7 +2,7 @@
   <div class="video-upload-container">
     <!-- Formulario de subida de video -->
     <div class="upload-section">
-      <h2>Subir nuevo video</h2>
+      <h2>Subir nuevo video EU</h2>
       <form @submit.prevent="handleSubmit" class="upload-form">
         <div class="form-group">
           <label for="video-name">Nombre del video:</label>
