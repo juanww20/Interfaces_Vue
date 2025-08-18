@@ -1,8 +1,7 @@
 <template>
   <div class="video-upload-container">
-    <!-- Formulario de subida de video -->
     <div class="upload-section">
-      <h2>Subir nuevo video EU</h2>
+      <h2>Subir y Configurar Video</h2>
       <form @submit.prevent="handleSubmit" class="upload-form">
         <div class="form-group">
           <label for="video-name">Nombre del video:</label>
@@ -19,29 +18,32 @@
 
         <div class="form-group">
           <label for="audio-file">Pistas de audio adicionales (opcional):</label>
-          <!-- Cambiado a múltiple -->
           <input id="audio-file" type="file" accept="audio/*" multiple @change="handleAudioUpload" />
-          <!-- Mostrar todos los audios -->
-          <div v-for="(audio, index) in videoData.audioFiles" :key="index" class="file-info">
-            Pista de audio: {{ audio.name }} ({{ formatFileSize(audio.size) }})
+          <div v-if="videoData.audioFiles.length > 0" class="file-list">
+            <div v-for="(file, index) in videoData.audioFiles" :key="index" class="file-item">
+              <span>{{ file.name }}</span>
+              <button @click.prevent="removeAudio(index)" class="remove-btn">×</button>
+            </div>
           </div>
         </div>
 
         <div class="form-group">
           <label for="subtitle-file">Archivos de subtítulos (VTT, opcional):</label>
-          <!-- Cambiado a múltiple -->
           <input id="subtitle-file" type="file" accept=".vtt" multiple @change="handleSubtitleUpload" />
-          <!-- Mostrar todos los subtítulos -->
-          <div v-for="(subtitle, index) in videoData.subtitleFiles" :key="index" class="file-info">
-            Subtítulos: {{ subtitle.name }} ({{ formatFileSize(subtitle.size) }})
+          <div v-if="videoData.subtitleFiles.length > 0" class="file-list">
+            <div v-for="(file, index) in videoData.subtitleFiles" :key="index" class="file-item">
+              <span>{{ file.name }}</span>
+              <button @click.prevent="removeSubtitle(index)" class="remove-btn">×</button>
+            </div>
           </div>
         </div>
 
-        <button type="submit" class="submit-btn">Subir video</button>
+        <button @click.prevent="generatePreview" :disabled="!videoData.file" class="preview-btn">
+          Previsualizar Video
+        </button>
       </form>
     </div>
 
-    <!-- Previsualización del video con controles -->
     <div class="preview-section" v-if="showPreview">
       <h2>Previsualización</h2>
       
@@ -54,43 +56,19 @@
             </option>
           </select>
         </div>
-        
-        <div class="control-group">
-          <label>Subtítulos:</label>
-          <select v-model="selectedSubtitle" @change="changeSubtitle">
-            <option value="-1">Desactivado</option>
-            <option v-for="(subtitle, index) in subtitles" :key="index" :value="index">
-              {{ subtitle.label }}
-            </option>
-          </select>
         </div>
-      </div>
       
       <div class="video-wrapper">
-        <video ref="videoPlayer" class="video-js vjs-big-play-centered" controls preload="auto">
-          <source :src="previewVideoSrc" type="video/mp4" />
-          <!-- Eliminado el track estático -->
-           <track 
-            v-for="(subtitle, index) in subtitles" 
-            :key="index"
-            kind="subtitles"
-            :src="subtitle.url"
-            :srclang="subtitle.lang || 'es'"
-            :label="subtitle.label"
-            :default="selectedSubtitle === index"
-          />
-          <p class="vjs-no-js">
-            Para ver este video, habilite JavaScript y considere actualizar a un navegador web que
-            <a href="https://videojs.com/html5-video-support/" target="_blank">soporte video HTML5</a>
-          </p>
-        </video>
+        <video ref="videoPlayer" class="video-js vjs-big-play-centered"></video>
       </div>
+      
+      <button @click="handleSubmit" class="submit-btn">Subir Video al Servidor</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { ref, reactive, onBeforeUnmount, nextTick } from 'vue';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
 
@@ -102,20 +80,21 @@ const videoData = reactive({
   subtitleFiles: []
 });
 
-// Referencias
+// Referencias del DOM y del reproductor
 const videoPlayer = ref(null);
 const playerInstance = ref(null);
 const audioElement = ref(null);
+
+// Estado de la UI
 const previewVideoSrc = ref('');
 const showPreview = ref(false);
 const selectedAudioTrack = ref(0);
-const selectedSubtitle = ref(-1);
 
-// Listas de pistas
+// Listas de pistas para el reproductor
 const audioTracks = ref([]);
 const subtitles = ref([]);
 
-// Event listeners para sincronización
+// Listeners de sincronización de audio
 const syncListeners = ref({
   play: null,
   pause: null,
@@ -124,93 +103,279 @@ const syncListeners = ref({
 });
 
 /**
- * Maneja la subida del archivo de video
+ * Maneja la selección del archivo de video
  */
 const handleVideoUpload = (event) => {
   const file = event.target.files[0];
   if (file && (file.type.includes('mp4') || file.name.toLowerCase().endsWith('.mp4'))) {
-    if (previewVideoSrc.value) {
-      URL.revokeObjectURL(previewVideoSrc.value);
-    }
-    
     videoData.file = file;
-    previewVideoSrc.value = URL.createObjectURL(file);
-    showPreview.value = true;
-    
-    // Resetear pistas
-    audioTracks.value = [{ label: 'Audio original', enabled: true }];
-    selectedAudioTrack.value = 0;
-    subtitles.value = [];
-    selectedSubtitle.value = -1;
-    
-    nextTick(() => {
-      if (playerInstance.value) {
-        playerInstance.value.src({ type: 'video/mp4', src: previewVideoSrc.value });
-        playerInstance.value.load();
-      } else {
-        initVideoPlayer();
-      }
-    });
   } else {
     alert('Por favor, sube un archivo MP4 válido.');
+    event.target.value = ''; // Limpiar input
   }
 };
 
 /**
- * Inicializa el reproductor de video
+ * Maneja la subida de múltiples audios y los añade a la lista
+ */
+const handleAudioUpload = (event) => {
+  const files = Array.from(event.target.files);
+  files.forEach(file => {
+    if (file.type.includes('audio')) {
+      videoData.audioFiles.push(file);
+    }
+  });
+  event.target.value = ''; // Limpiar para poder subir el mismo archivo otra vez
+};
+
+/**
+ * Elimina un audio de la lista
+ */
+const removeAudio = (index) => {
+  videoData.audioFiles.splice(index, 1);
+};
+
+/**
+ * Maneja la subida de múltiples subtítulos y los añade a la lista
+ */
+const handleSubtitleUpload = (event) => {
+  const files = Array.from(event.target.files);
+  files.forEach(file => {
+    if (file.name.toLowerCase().endsWith('.vtt')) {
+      videoData.subtitleFiles.push(file);
+    }
+  });
+  event.target.value = ''; // Limpiar para poder subir el mismo archivo otra vez
+};
+
+/**
+ * Elimina un subtítulo de la lista
+ */
+const removeSubtitle = (index) => {
+  videoData.subtitleFiles.splice(index, 1);
+};
+
+/**
+ * Prepara los datos y muestra la sección de previsualización
+ */
+const generatePreview = async () => {
+  if (!videoData.file) return;
+
+  // Limpiar URLs previas si se regenera la preview
+  if (previewVideoSrc.value) URL.revokeObjectURL(previewVideoSrc.value);
+  audioTracks.value.forEach(track => track.url && URL.revokeObjectURL(track.url));
+  subtitles.value.forEach(sub => sub.url && URL.revokeObjectURL(sub.url));
+  
+  // Crear URLs para los archivos seleccionados
+  previewVideoSrc.value = URL.createObjectURL(videoData.file);
+  
+  // Poblar pistas de audio
+  audioTracks.value = [{ label: 'Audio original', url: null }];
+  videoData.audioFiles.forEach(file => {
+    audioTracks.value.push({
+      label: file.name.replace(/\.[^/.]+$/, ""), // Nombre sin extensión
+      url: URL.createObjectURL(file)
+    });
+  });
+
+  // Poblar pistas de subtítulos
+  subtitles.value = videoData.subtitleFiles.map(file => ({
+    label: file.name.replace('.vtt', '').replace(/_/g, ' '),
+    url: URL.createObjectURL(file),
+    lang: 'es' // Puedes hacerlo más dinámico si lo necesitas
+  }));
+
+  showPreview.value = true;
+  selectedAudioTrack.value = 0;
+  
+  await nextTick();
+  initVideoPlayer();
+};
+
+/**
+ * Inicializa el reproductor de Video.js con la configuración completa
  */
 const initVideoPlayer = () => {
   if (!videoPlayer.value) return;
-  
   if (playerInstance.value) {
     playerInstance.value.dispose();
   }
   
   playerInstance.value = videojs(videoPlayer.value, {
-    autoplay: false,
     controls: true,
+    autoplay: false,
+    preload: 'auto',
     responsive: true,
     fluid: true,
     playbackRates: [0.5, 1, 1.5, 2],
-    controlBar: {
-      children: [
-        'playToggle',
-        'progressControl',
-        'volumePanel',
-        'currentTimeDisplay',
-        'timeDivider',
-        'durationDisplay',
-        'playbackRateMenuButton',
-        'subsCapsButton',
-        'fullscreenToggle'
-      ]
+    sources: [{
+      src: previewVideoSrc.value,
+      type: videoData.file.type
+    }],
+    // --- CAMBIO CLAVE: Añadir las pistas de subtítulos aquí ---
+    tracks: subtitles.value.map((sub, index) => ({
+      kind: 'subtitles',
+      src: sub.url,
+      srclang: sub.lang,
+      label: sub.label,
+      default: index === 0 // El primero es el predeterminado
+    }))
+  }, () => {
+    console.log('Reproductor listo!');
+    // Puedes personalizar el botón de subtítulos aquí si lo necesitas
+    const subsButton = playerInstance.value.controlBar.subsCapsButton;
+    if (subsButton) {
+        subsButton.controlText('Subtítulos');
     }
   });
-  
+
   playerInstance.value.on('error', (e) => {
     console.error('Error del reproductor:', playerInstance.value.error());
   });
 };
 
 /**
- * Maneja la subida de múltiples audios
+ * Cambia la pista de audio activa
  */
-const handleAudioUpload = (event) => {
-  const files = event.target.files;
-  if (!files.length) return;
+const changeAudioTrack = () => {
+  if (!playerInstance.value) return;
   
-  Array.from(files).forEach(file => {
-    if (file.type.includes('audio')) {
-      videoData.audioFiles.push(file);
-      const audioUrl = URL.createObjectURL(file);
-      audioTracks.value.push({
-        label: file.name,
-        url: audioUrl,
-        enabled: true
+  const wasPlaying = !playerInstance.value.paused();
+  const currentTime = playerInstance.value.currentTime();
+  const playbackRate = playerInstance.value.playbackRate();
+  
+  // Solo pausar si estamos cambiando a un audio externo
+  if (selectedAudioTrack.value !== 0 && audioElement.value) {
+    playerInstance.value.pause();
+  }
+  
+  // Limpiar audio externo anterior si existe
+  if (audioElement.value) {
+    audioElement.value.pause();
+    audioElement.value = null;
+  }
+  
+  removeSyncListeners();
+  
+  const trackIndex = selectedAudioTrack.value;
+  
+  if (trackIndex === 0) {
+    // Audio original - restaurar volumen normal sin interrumpir reproducción
+    playerInstance.value.volume(1);
+    
+    // Si estaba reproduciendo, continuar sin pausa
+    if (wasPlaying) {
+      playerInstance.value.play().catch(e => console.error("Error al reanudar:", e));
+    }
+  } 
+  else if (trackIndex > 0 && trackIndex < audioTracks.value.length) {
+    const track = audioTracks.value[trackIndex];
+    
+    // Configurar audio externo
+    audioElement.value = new Audio(track.url);
+    audioElement.value.currentTime = currentTime;
+    audioElement.value.playbackRate = playbackRate;
+    
+    // Listeners mejorados
+    const onPlay = () => {
+      if (audioElement.value.paused) {
+        audioElement.value.currentTime = playerInstance.value.currentTime();
+        audioElement.value.playbackRate = playerInstance.value.playbackRate();
+        audioElement.value.play().catch(e => console.error("Error audio externo:", e));
+      }
+    };
+    
+    const onPause = () => {
+      if (!audioElement.value.paused) {
+        audioElement.value.pause();
+      }
+    };
+    
+    const onSeeking = () => {
+      audioElement.value.currentTime = playerInstance.value.currentTime();
+    };
+    
+    const onTimeupdate = () => {
+      const diff = Math.abs(audioElement.value.currentTime - playerInstance.value.currentTime());
+      if (diff > 0.15) { // Umbral optimizado
+        audioElement.value.currentTime = playerInstance.value.currentTime();
+      }
+    };
+    
+    const onRatechange = () => {
+      audioElement.value.playbackRate = playerInstance.value.playbackRate();
+    };
+    
+    // Asignar listeners
+    playerInstance.value.on('play', onPlay);
+    playerInstance.value.on('pause', onPause);
+    playerInstance.value.on('seeking', onSeeking);
+    playerInstance.value.on('timeupdate', onTimeupdate);
+    playerInstance.value.on('ratechange', onRatechange);
+    
+    syncListeners.value = {
+      play: onPlay,
+      pause: onPause,
+      seeking: onSeeking,
+      timeupdate: onTimeupdate,
+      ratechange: onRatechange
+    };
+    
+    // Configurar volúmenes
+    playerInstance.value.volume(0);
+    
+    // Iniciar reproducción si estaba en play
+    if (wasPlaying) {
+      playerInstance.value.play().then(() => {
+        audioElement.value.play().catch(e => console.error("Error al iniciar audio externo:", e));
       });
     }
-  });
+  }
 };
+
+
+/**
+ * Formatea el tamaño del archivo para mostrarlo
+ */
+const formatFileSize = (bytes) => {
+  if (!bytes) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
+/**
+ * Maneja el envío final del formulario (simulado)
+ */
+const handleSubmit = () => {
+  console.log('Datos del video a subir:', {
+    name: videoData.name,
+    video: videoData.file,
+    audioFiles: videoData.audioFiles,
+    subtitleFiles: videoData.subtitleFiles
+  });
+  alert('Video listo para ser subido. Revisa la consola para ver los datos. En una implementación real, aquí se enviaría todo al servidor.');
+};
+
+/**
+ * Limpia recursos al desmontar el componente
+ */
+onBeforeUnmount(() => {
+  if (playerInstance.value) {
+    playerInstance.value.dispose();
+  }
+  if (previewVideoSrc.value) {
+    URL.revokeObjectURL(previewVideoSrc.value);
+  }
+  audioTracks.value.forEach(track => {
+    if (track.url) URL.revokeObjectURL(track.url);
+  });
+  subtitles.value.forEach(sub => {
+    if (sub.url) URL.revokeObjectURL(sub.url);
+  });
+  removeSyncListeners();
+});
 
 /**
  * Elimina los event listeners de sincronización
@@ -225,170 +390,9 @@ const removeSyncListeners = () => {
     }
   });
 };
-
-/**
- * Cambia la pista de audio activa
- */
-const changeAudioTrack = () => {
-  if (!playerInstance.value) return;
-  
-  const wasPlaying = !playerInstance.value.paused();
-  const currentTime = playerInstance.value.currentTime();
-  playerInstance.value.pause();
-  
-  if (audioElement.value) {
-    audioElement.value.pause();
-    audioElement.value = null;
-  }
-  
-  removeSyncListeners();
-  
-  const trackIndex = selectedAudioTrack.value;
-  
-  if (trackIndex === 0) {
-    playerInstance.value.volume(1);
-  } 
-  else if (trackIndex > 0 && trackIndex < audioTracks.value.length) {
-    const track = audioTracks.value[trackIndex];
-    
-    audioElement.value = new Audio(track.url);
-    audioElement.value.currentTime = currentTime;
-    
-    // Definir listeners
-    const onPlay = () => audioElement.value.play();
-    const onPause = () => audioElement.value.pause();
-    const onSeeking = () => {
-      audioElement.value.currentTime = playerInstance.value.currentTime();
-    };
-    const onTimeupdate = () => {
-      const diff = Math.abs(audioElement.value.currentTime - playerInstance.value.currentTime());
-      if (diff > 0.1) {
-        audioElement.value.currentTime = playerInstance.value.currentTime();
-      }
-    };
-    
-    // Asignar listeners
-    playerInstance.value.on('play', onPlay);
-    playerInstance.value.on('pause', onPause);
-    playerInstance.value.on('seeking', onSeeking);
-    playerInstance.value.on('timeupdate', onTimeupdate);
-    
-    syncListeners.value = {
-      play: onPlay,
-      pause: onPause,
-      seeking: onSeeking,
-      timeupdate: onTimeupdate
-    };
-    
-    playerInstance.value.volume(0);
-  }
-  
-  if (wasPlaying) {
-    setTimeout(() => playerInstance.value.play(), 100);
-  }
-};
-
-/**
- * Cambia los subtítulos activos
- */
-const changeSubtitle = () => {
-  if (!playerInstance.value) return;
-  
-  const tracks = playerInstance.value.remoteTextTracks();
-  for (let i = tracks.length - 1; i >= 0; i--) {
-    playerInstance.value.removeRemoteTextTrack(tracks[i]);
-  }
-  
-  if (selectedSubtitle.value >= 0 && selectedSubtitle.value < subtitles.value.length) {
-    const subtitle = subtitles.value[selectedSubtitle.value];
-    playerInstance.value.addRemoteTextTrack({
-      kind: 'subtitles',
-      src: subtitle.url,
-      srclang: subtitle.lang || 'es',
-      label: subtitle.label,
-      default: true
-    }, false);
-  }
-};
-
-/**
- * Maneja la subida de múltiples subtítulos
- */
-const handleSubtitleUpload = (event) => {
-  const files = event.target.files;
-  if (!files.length) return;
-  
-  Array.from(files).forEach(file => {
-    if (file.name.toLowerCase().endsWith('.vtt')) {
-      videoData.subtitleFiles.push(file);
-      const subtitleUrl = URL.createObjectURL(file);
-      subtitles.value.push({
-        label: file.name.replace('.vtt', ''),
-        url: subtitleUrl,
-        lang: 'es'
-      });
-    }
-  });
-};
-
-/**
- * Formatea el tamaño del archivo
- */
-const formatFileSize = (bytes) => {
-  if (!bytes) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-};
-
-/**
- * Maneja el envío del formulario
- */
-const handleSubmit = () => {
-  console.log('Datos del video a subir:', {
-    name: videoData.name,
-    video: videoData.file,
-    audioFiles: videoData.audioFiles,
-    subtitleFiles: videoData.subtitleFiles
-  });
-
-  alert('Video listo para ser subido. En una implementación real, se enviaría al servidor.');
-};
-
-onMounted(() => {
-  if (previewVideoSrc.value) {
-    initVideoPlayer();
-  }
-});
-
-onBeforeUnmount(() => {
-  if (previewVideoSrc.value) {
-    URL.revokeObjectURL(previewVideoSrc.value);
-  }
-  
-  if (audioElement.value) {
-    audioElement.value.pause();
-    audioElement.value = null;
-  }
-  
-  audioTracks.value.forEach(track => {
-    if (track.url) URL.revokeObjectURL(track.url);
-  });
-  
-  subtitles.value.forEach(sub => {
-    if (sub.url) URL.revokeObjectURL(sub.url);
-  });
-  
-  removeSyncListeners();
-  
-  if (playerInstance.value) {
-    playerInstance.value.dispose();
-  }
-});
 </script>
 
-<style>
+<style scoped>
 .video-upload-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -438,20 +442,101 @@ onBeforeUnmount(() => {
   margin-top: 5px;
 }
 
+/* Estilos para la lista de archivos con botón de eliminar */
+.file-list {
+  margin-top: 10px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 5px;
+  max-height: 150px;
+  overflow-y: auto;
+  background-color: #fff;
+}
+
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+}
+
+.file-item:last-child {
+  border-bottom: none;
+}
+
+.remove-btn {
+  background: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.remove-btn:hover {
+  background: #cc0000;
+}
+
+/* MODIFIED BUTTON STYLES */
+.preview-btn {
+  background-color: #007BFF;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 15px;
+  transition: all 0.3s;
+  width: 100%;
+  max-width: 300px;
+  align-self: center;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+.preview-btn:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.preview-btn:active {
+  transform: translateY(0);
+}
+.preview-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .submit-btn {
   background-color: #4CAF50;
   color: white;
-  padding: 10px 15px;
+  padding: 12px 20px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 16px;
-  margin-top: 10px;
-  transition: background-color 0.3s;
+  margin-top: 20px;
+  transition: all 0.3s;
+  align-self: center;
+  width: 100%;
+  max-width: 300px;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
-
 .submit-btn:hover {
   background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .preview-controls {
@@ -470,9 +555,7 @@ onBeforeUnmount(() => {
 }
 
 .control-group label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+  font-weight: bold;
 }
 
 .control-group select {
@@ -481,15 +564,19 @@ onBeforeUnmount(() => {
   border-radius: 4px;
 }
 
+/* MODIFIED VIDEO WRAPPER STYLES */
 .video-wrapper {
   width: 100%;
-  height: 400px;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 .video-js {
   width: 100%;
-  height: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
   background-color: #000;
+  max-height: 80vh;
 }
 
 h2 {
@@ -501,28 +588,30 @@ h2 {
 }
 
 @media (min-width: 768px) {
-  .video-upload-container {
-    flex-direction: row;
-  }
-
-  .upload-section,
-  .preview-section {
-    flex: 1;
-  }
-  
-  .preview-section {
-    max-width: 800px;
+  .preview-btn,
+  .submit-btn {
+    width: auto;
+    padding: 12px 30px;
   }
 }
 
-@media (max-width: 767px) {
-  .preview-controls {
-    flex-direction: column;
-    gap: 10px;
+@media (min-width: 992px) {
+  .video-upload-container {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .upload-section {
+    flex: 1;
+    max-width: 400px;
+  }
+  
+  .preview-section {
+    flex: 2;
   }
   
   .video-wrapper {
-    height: 300px;
+    max-width: none;
   }
 }
 </style>
