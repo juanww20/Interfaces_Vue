@@ -3,12 +3,14 @@
     <header class="header">
       <h3>Carrusel de Videos con Subtítulos</h3>
     </header>
-    
+
     <Carousel v-bind="config" class="contendor">
       <Slide v-for="(video, index) in videos" :key="index">
         <div class="custom-slide" @click="openModal(video)">
           <img v-if="video.thumbnail" :src="video.thumbnail" class="video-thumbnail" />
-          <div class="video-title"> <h3 class="Cambio_subtitulo">{{ video.title }}</h3></div>
+          <div class="video-title">
+            <h3 class="Cambio_subtitulo">{{ video.title }}</h3>
+          </div>
           <div class="video-subtitle-indicator" v-if="video.subtitles.length > 0">
             <span class="subtitle-icon">CC</span>
           </div>
@@ -25,37 +27,42 @@
     <div v-if="selectedVideo" class="modal-overlay" @click.self="closeModal">
       <div class="modal-content">
         <button class="close-button" @click="closeModal">&times;</button>
-        
+
         <div class="modal-grid">
           <div class="video-container">
             <div class="video-wrapper">
               <video ref="videoPlayer" class="video-js vjs-big-play-centered"></video>
             </div>
           </div>
-          
+
           <div class="details-container">
             <h3 class="video-title Cambio_subtitulo2">{{ selectedVideo.title }}</h3>
-            
+
             <div class="detail-item">
               <span class="detail-label">Nombre:</span>
               <span class="detail-value">{{ selectedVideo.title }}</span>
             </div>
-            
+
             <div class="detail-item">
               <span class="detail-label">Tamaño:</span>
               <span class="detail-value">{{ formatFileSize(selectedVideo.size) }}</span>
             </div>
-            
+
+            <div class="detail-item">
+              <span class="detail-label">Formato:</span>
+              <span class="detail-value">{{ selectedVideo.format }}</span>
+            </div>
+
             <div class="detail-item">
               <span class="detail-label">Dimensiones:</span>
               <span class="detail-value">{{ videoDimensions.width }}px x {{ videoDimensions.height }}px</span>
             </div>
-            
+
             <div class="detail-item">
               <span class="detail-label">Duración:</span>
               <span class="detail-value">{{ formatDuration(selectedVideo.duration) }}</span>
             </div>
-            
+
             <div class="control-group">
               <label for="audio-track">Pista de audio:</label>
               <select id="audio-track" v-model="selectedAudioTrack" @change="changeAudioTrack">
@@ -84,7 +91,7 @@
 <script setup>
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel';
 import 'vue3-carousel/carousel.css';
-import { ref, reactive, onBeforeUnmount, nextTick, onMounted} from 'vue';
+import { ref, reactive, onBeforeUnmount, nextTick, onMounted } from 'vue';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
 import VideoExample from '@/assets/temp/eu.mp4'
@@ -102,7 +109,7 @@ const generateVideoThumbnail = (videoSrc) => {
   return new Promise((resolve, reject) => {
     const video = document.createElement('video');
     video.src = videoSrc;
-    video.crossOrigin = 'anonymous'; 
+    video.crossOrigin = 'anonymous';
     video.preload = 'metadata'; // Optimización: solo necesitamos los metadatos iniciales
 
     // 1. Esperamos a que los metadatos (duración, dimensiones) se carguen
@@ -153,6 +160,7 @@ const videos = ref([
     title: 'Naturaleza en 4K',
     videoSrc: VideoExample,
     thumbnail: '',
+    format: 'mp4',
     size: 1024 * 1024, // 1MB
     duration: 60, // 60 segundos
     audioTracks: [
@@ -160,8 +168,8 @@ const videos = ref([
       { label: 'Música relajante', src: AudioExample }
     ],
     subtitles: [
-        {label: 'Español', lang: 'es', src: SubtituloExample},
-        {label: 'Ingles', lang: 'in', src: SubtituloExample2}
+      { label: 'Español', lang: 'es', src: SubtituloExample },
+      { label: 'Ingles', lang: 'in', src: SubtituloExample2 }
     ]
   },
   {
@@ -169,6 +177,7 @@ const videos = ref([
     title: 'Ciudad al atardecer',
     videoSrc: VideoExample,
     thumbnail: '',
+    format: 'mp4',
     size: 2.5 * 1024 * 1024, // 2.5MB
     duration: 45, // 45 segundos
     audioTracks: [
@@ -176,8 +185,8 @@ const videos = ref([
       { label: 'Sonidos urbanos', src: AudioExample }
     ],
     subtitles: [
-        {label: 'Español', lang: 'es', src: SubtituloExample},
-        {label: 'Ingles', lang: 'in', src: SubtituloExample2}
+      { label: 'Español', lang: 'es', src: SubtituloExample },
+      { label: 'Ingles', lang: 'in', src: SubtituloExample2 }
     ] // Solo español
   },
   {
@@ -185,26 +194,28 @@ const videos = ref([
     title: 'Playas paradisíacas',
     videoSrc: VideoExample,
     thumbnail: '',
+    format: 'mp4',
     size: 3.8 * 1024 * 1024, // 3.8MB
     duration: 90, // 90 segundos
     audioTracks: [
       { label: 'Audio original', src: null },
       { label: 'Olas del mar', src: AudioExample }
     ],
-    subtitles: [{label: 'Español', lang: 'es', src: SubtituloExample}] // Solo inglés
+    subtitles: [{ label: 'Español', lang: 'es', src: SubtituloExample }] // Solo inglés
   },
   {
     id: 4,
     title: 'Montañas nevadas',
     videoSrc: VideoExample,
     thumbnail: '',
+    format: 'mp4',
     size: 4.2 * 1024 * 1024, // 4.2MB
     duration: 75, // 75 segundos
     audioTracks: [
       { label: 'Audio original', src: null },
       { label: 'Sonidos de viento', src: AudioExample }
     ],
-    subtitles: [{label: 'Español', lang: 'es', src: SubtituloExample}] // Ambos idiomas
+    subtitles: [{ label: 'Español', lang: 'es', src: SubtituloExample }] // Ambos idiomas
   }
 ]);
 
@@ -241,7 +252,7 @@ const openModal = (video) => {
   audioTracks.value = video.audioTracks;
   selectedAudioTrack.value = 0;
   selectedSubtitleTrack.value = -1;
-  
+
   nextTick(() => {
     initVideoPlayer();
   });
@@ -265,11 +276,11 @@ const closeModal = () => {
 // Inicializar el reproductor de video con subtítulos
 const initVideoPlayer = () => {
   if (!videoPlayer.value) return;
-  
+
   if (playerInstance.value) {
     playerInstance.value.dispose();
   }
-  
+
   // Configuración del reproductor con soporte para subtítulos
   playerInstance.value = videojs(videoPlayer.value, {
     controls: true,
@@ -293,9 +304,9 @@ const initVideoPlayer = () => {
     console.log('Reproductor listo con subtítulos!');
 
     // Método 2: Añadir estilos CSS dinámicamente
-      const style = document.createElement('style');
-      style.type = 'text/css';
-      style.innerHTML = `
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.innerHTML = `
         .video-js .vjs-text-track-cue div {
           color: var(--dark-color) !important;
           background-color: rgba(0, 0, 0, 0.5) !important;
@@ -309,8 +320,8 @@ const initVideoPlayer = () => {
             0 -2px 2px black !important;
         }
       `;
-      document.head.appendChild(style);
-    
+    document.head.appendChild(style);
+
     // Obtener dimensiones del video
     playerInstance.value.on('loadedmetadata', () => {
       videoDimensions.value = {
@@ -318,14 +329,14 @@ const initVideoPlayer = () => {
         height: playerInstance.value.videoHeight()
       };
     });
-    
+
     // Configurar el botón de subtítulos
     const subsButton = playerInstance.value.controlBar.subsCapsButton;
     if (subsButton) {
       subsButton.controlText('Subtítulos');
     }
   });
-  
+
   // Configurar la pista de audio inicial
   changeAudioTrack();
 };
@@ -333,15 +344,15 @@ const initVideoPlayer = () => {
 // Cambiar subtítulos
 const changeSubtitleTrack = () => {
   if (!playerInstance.value) return;
-  
+
   const trackIndex = selectedSubtitleTrack.value;
   const textTracks = playerInstance.value.textTracks();
-  
+
   // Desactivar todos los subtítulos primero
   for (let i = 0; i < textTracks.length; i++) {
     textTracks[i].mode = 'disabled';
   }
-  
+
   // Activar el subtítulo seleccionado si no es -1
   if (trackIndex >= 0 && trackIndex < textTracks.length) {
     textTracks[trackIndex].mode = 'showing';
@@ -351,15 +362,15 @@ const changeSubtitleTrack = () => {
 // Cambiar pista de audio (igual que antes)
 const changeAudioTrack = () => {
   if (!playerInstance.value) return;
-  
+
   const trackIndex = selectedAudioTrack.value;
-  
+
   if (audioElement.value) {
     audioElement.value.pause();
     audioElement.value = null;
     removeSyncListeners();
   }
-  
+
   if (trackIndex === 0) {
     playerInstance.value.volume(1);
   } else if (trackIndex < audioTracks.value.length) {
@@ -367,13 +378,13 @@ const changeAudioTrack = () => {
     const wasPlaying = !playerInstance.value.paused();
     const currentTime = playerInstance.value.currentTime();
     const playbackRate = playerInstance.value.playbackRate();
-    
+
     playerInstance.value.pause();
-    
+
     audioElement.value = new Audio(track.src);
     audioElement.value.currentTime = currentTime;
     audioElement.value.playbackRate = playbackRate;
-    
+
     const onPlay = () => {
       if (audioElement.value.paused) {
         audioElement.value.currentTime = playerInstance.value.currentTime();
@@ -381,34 +392,34 @@ const changeAudioTrack = () => {
         audioElement.value.play().catch(e => console.error("Error al reproducir audio:", e));
       }
     };
-    
+
     const onPause = () => {
       if (!audioElement.value.paused) {
         audioElement.value.pause();
       }
     };
-    
+
     const onSeeking = () => {
       audioElement.value.currentTime = playerInstance.value.currentTime();
     };
-    
+
     const onTimeupdate = () => {
       const diff = Math.abs(audioElement.value.currentTime - playerInstance.value.currentTime());
       if (diff > 0.15) {
         audioElement.value.currentTime = playerInstance.value.currentTime();
       }
     };
-    
+
     const onRatechange = () => {
       audioElement.value.playbackRate = playerInstance.value.playbackRate();
     };
-    
+
     playerInstance.value.on('play', onPlay);
     playerInstance.value.on('pause', onPause);
     playerInstance.value.on('seeking', onSeeking);
     playerInstance.value.on('timeupdate', onTimeupdate);
     playerInstance.value.on('ratechange', onRatechange);
-    
+
     syncListeners.value = {
       play: onPlay,
       pause: onPause,
@@ -416,9 +427,9 @@ const changeAudioTrack = () => {
       timeupdate: onTimeupdate,
       ratechange: onRatechange
     };
-    
+
     playerInstance.value.volume(0);
-    
+
     if (wasPlaying) {
       playerInstance.value.play().then(() => {
         audioElement.value.play().catch(e => console.error("Error al iniciar audio:", e));
@@ -433,7 +444,7 @@ const formatFileSize = (bytes) => {
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i]);
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
 // Formatear duración (segundos a MM:SS)
@@ -446,7 +457,7 @@ const formatDuration = (seconds) => {
 // Limpiar listeners de sincronización
 const removeSyncListeners = () => {
   if (!playerInstance.value) return;
-  
+
   Object.keys(syncListeners.value).forEach(event => {
     if (syncListeners.value[event]) {
       playerInstance.value.off(event, syncListeners.value[event]);
@@ -505,7 +516,7 @@ onMounted(async () => {
   padding: 15px;
   border-radius: 8px;
   display: inline-block;
-  font-size: var(--title-font); 
+  font-size: var(--title-font);
   color: var(----dark-color);
 }
 
@@ -552,7 +563,7 @@ onMounted(async () => {
   text-overflow: ellipsis;
 }
 
-.Cambio_subtitulo{
+.Cambio_subtitulo {
   color: var(--dark-color);
   font-family: var(--font-secundaria);
   font-size: var(--subtitle-font);
@@ -650,7 +661,8 @@ onMounted(async () => {
 .video-wrapper {
   width: 100%;
   position: relative;
-  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  padding-top: 56.25%;
+  /* 16:9 Aspect Ratio */
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
@@ -750,7 +762,7 @@ onMounted(async () => {
   cursor: pointer;
 }
 
-.vjs-text-track-cue.vjs-text-track-cue-es{}
+.vjs-text-track-cue.vjs-text-track-cue-es {}
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -758,17 +770,17 @@ onMounted(async () => {
     width: 95%;
     padding: 20px;
   }
-  
+
   .detail-item {
     flex-direction: column;
     gap: 5px;
   }
-  
+
   .control-group {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .config {
     itemsToShow: 2;
   }
@@ -778,7 +790,7 @@ onMounted(async () => {
   .config {
     itemsToShow: 1;
   }
-  
+
   .header h3 {
     font-size: 1.5rem;
   }
