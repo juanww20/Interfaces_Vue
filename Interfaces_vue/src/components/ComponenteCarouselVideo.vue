@@ -8,7 +8,7 @@
       <Slide v-for="(video, index) in videos" :key="index">
         <div class="custom-slide" @click="openModal(video)">
           <img v-if="video.thumbnail" :src="video.thumbnail" class="video-thumbnail" />
-          <div class="video-title">{{ video.title }}</div>
+          <div class="video-title"> <h3 class="Cambio_subtitulo">{{ video.title }}</h3></div>
           <div class="video-subtitle-indicator" v-if="video.subtitles.length > 0">
             <span class="subtitle-icon">CC</span>
           </div>
@@ -34,7 +34,7 @@
           </div>
           
           <div class="details-container">
-            <h3 class="video-title">{{ selectedVideo.title }}</h3>
+            <h3 class="video-title Cambio_subtitulo2">{{ selectedVideo.title }}</h3>
             
             <div class="detail-item">
               <span class="detail-label">Nombre:</span>
@@ -291,6 +291,25 @@ const initVideoPlayer = () => {
     }))
   }, () => {
     console.log('Reproductor listo con subtítulos!');
+
+    // Método 2: Añadir estilos CSS dinámicamente
+      const style = document.createElement('style');
+      style.type = 'text/css';
+      style.innerHTML = `
+        .video-js .vjs-text-track-cue div {
+          color: var(--dark-color) !important;
+          background-color: rgba(0, 0, 0, 0.5) !important;
+          font-size: var(--text-font) !important;
+          font-family: var(--font-secundaria) !important;
+          font-weight: bold !important;
+          text-shadow: 
+            2px 0 2px black,
+            -2px 0 2px black,
+            0 2px 2px black,
+            0 -2px 2px black !important;
+        }
+      `;
+      document.head.appendChild(style);
     
     // Obtener dimensiones del video
     playerInstance.value.on('loadedmetadata', () => {
@@ -467,12 +486,12 @@ onMounted(async () => {
 <style scoped>
 .video-carousel-container {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 50px auto;
   padding: 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #1a2a6c, #1a2a6c);
+  font-family: var(--font-principal);
+  /* background: linear-gradient(135deg, #bac3ea, #778bda); */
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  /* box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); */
 }
 
 .header {
@@ -483,21 +502,18 @@ onMounted(async () => {
 .header h3 {
   font-size: 2rem;
   color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   padding: 15px;
-  background: rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   display: inline-block;
+  font-size: var(--title-font); 
+  color: var(----dark-color);
 }
 
 .carousel {
-  --vc-pgn-background-color: #e0e0e0;
-  --vc-pgn-active-color: #4a00e0;
-  --vc-nav-background: #4a00e0;
-  --vc-nav-color: white;
-  --vc-nav-border-radius: 50%;
-  --vc-nav-width: 40px;
-  --vc-nav-height: 40px;
+  --vc-pgn-background-color: var(--ligth-color);
+  --vc-pgn-active-color: var(--primary-color);
+  --vc-nav-background: var(--secondary-color);
+  --vc-nav-border-radius: 100%;
 }
 
 .custom-slide {
@@ -511,6 +527,7 @@ onMounted(async () => {
   transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
+  margin-bottom: 20px;
 }
 
 .custom-slide:hover {
@@ -529,11 +546,21 @@ onMounted(async () => {
   padding: 15px 10px;
   text-align: center;
   font-weight: 600;
-  font-size: 1.1rem;
   background: white;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.Cambio_subtitulo{
+  color: var(--dark-color);
+  font-family: var(--font-secundaria);
+  font-size: var(--subtitle-font);
+}
+
+.Cambio_subtitulo2 {
+  color: var(--ligth-color);
+  font-size: var(--subtitle-font);
 }
 
 .video-subtitle-indicator {
@@ -546,7 +573,7 @@ onMounted(async () => {
 }
 
 .subtitle-icon {
-  color: white;
+  color: var(--ligth-color);
   font-size: 0.8rem;
   font-weight: bold;
 }
@@ -573,7 +600,7 @@ onMounted(async () => {
 }
 
 .modal-content {
-  background: linear-gradient(to bottom right, #1a2a6c, #b21f1f);
+  background: #e0e0e0;
   padding: 30px;
   border-radius: 15px;
   width: 90%;
@@ -648,8 +675,6 @@ onMounted(async () => {
 
 .video-title {
   margin: 0 0 20px 0;
-  color: white;
-  font-size: 1.8rem;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   padding-bottom: 15px;
   border-bottom: 2px solid rgba(255, 255, 255, 0.2);
@@ -666,14 +691,17 @@ onMounted(async () => {
 
 .detail-label {
   font-weight: bold;
-  color: #ffcc00;
+  color: var(--dark-color);
   min-width: 120px;
-  font-size: 1.1rem;
+  font-size: var(--text-font);
+  font-family: var(--font-secundaria);
+
 }
 
 .detail-value {
-  color: white;
-  font-size: 1.1rem;
+  color: var(--ligth-color);
+  font-size: var(--text-font);
+  font-family: var(--font-secundaria);
 }
 
 .control-group {
@@ -688,8 +716,9 @@ onMounted(async () => {
 
 .control-group label {
   font-weight: bold;
-  color: #ffcc00;
-  font-size: 1.1rem;
+  color: var(--dark-color);
+  font-size: var(--text-font);
+  font-family: var(--font-secundaria);
 }
 
 .control-group select {
@@ -701,6 +730,9 @@ onMounted(async () => {
   min-width: 200px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
   cursor: pointer;
+  color: var(--dark-color);
+  font-size: var(--text-font);
+  font-family: var(--font-secundaria);
 }
 
 .control-group select:focus {
@@ -717,6 +749,8 @@ onMounted(async () => {
 :deep(.video-js .vjs-subs-caps-button) {
   cursor: pointer;
 }
+
+.vjs-text-track-cue.vjs-text-track-cue-es{}
 
 /* Responsive */
 @media (max-width: 768px) {
