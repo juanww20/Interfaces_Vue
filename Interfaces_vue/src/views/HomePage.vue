@@ -5,6 +5,7 @@
     <ComponenteSectionService></ComponenteSectionService>
     <ComponentePortafolio></ComponentePortafolio>
     <ComponenteCarousel></ComponenteCarousel>
+    <ComponenteCarouselVideo></ComponenteCarouselVideo>
     <ComponenteContactoSection></ComponenteContactoSection>
 </template>
 
@@ -16,6 +17,7 @@ import ComponenteContactoSection from '@/components/ComponenteContactoSection.vu
 import ComponentePortafolio from '@/components/ComponentePortafolio.vue';
 import ComponenteCarousel from '@/components/ComponenteCarousel.vue';
 import LoaderAnimation from '@/components/LoaderAnimation.vue';
+import ComponenteCarouselVideo from '@/components/ComponenteCarouselVideo.vue';
 import { ref } from 'vue';
 
 // showLoader: extrae valor booleano de localStorage ('true' o 'false'), default true
