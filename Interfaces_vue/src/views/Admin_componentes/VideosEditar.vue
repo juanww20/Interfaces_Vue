@@ -21,7 +21,7 @@
           <input id="audio-file" type="file" accept="audio/*" multiple @change="handleAudioUpload" />
           <div v-if="videoData.audioFiles.length > 0" class="file-list">
             <div v-for="(file, index) in videoData.audioFiles" :key="index" class="file-item">
-              <span>{{ file.name }}</span>
+              <span>{{ file.name }} ({{ formatFileSize(file.size) }})</span>
               <button @click.prevent="removeAudio(index)" class="remove-btn">×</button>
             </div>
           </div>
@@ -32,7 +32,7 @@
           <input id="subtitle-file" type="file" accept=".vtt" multiple @change="handleSubtitleUpload" />
           <div v-if="videoData.subtitleFiles.length > 0" class="file-list">
             <div v-for="(file, index) in videoData.subtitleFiles" :key="index" class="file-item">
-              <span>{{ file.name }}</span>
+              <span>{{ file.name }} ({{ formatFileSize(file.size) }})</span>
               <button @click.prevent="removeSubtitle(index)" class="remove-btn">×</button>
             </div>
           </div>
@@ -102,6 +102,63 @@ const syncListeners = ref({
   timeupdate: null
 });
 
+// Función para obtener duración de medios
+const getMediaDuration = (file) => {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const media = file.type.includes('audio') ? new Audio() : document.createElement('video');
+    
+    media.src = url;
+    media.onloadedmetadata = () => {
+      resolve(media.duration);
+      URL.revokeObjectURL(url);
+    };
+    
+    media.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(0);
+    };
+  });
+};
+
+// Función para estimar duración de subtítulos VTT
+const getSubtitleDuration = (file) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const vttContent = e.target.result;
+      const lines = vttContent.split('\n');
+      let lastTime = 0;
+      
+      // Buscar el último marcador de tiempo
+      for (const line of lines) {
+        if (line.includes('-->')) {
+          const parts = line.split('-->')[1].trim().split(' ');
+          const endTime = parts[0];
+          const seconds = convertVttTimeToSeconds(endTime);
+          lastTime = Math.max(lastTime, seconds);
+        }
+      }
+      
+      resolve(lastTime || 0);
+    };
+    reader.onerror = () => resolve(0);
+    reader.readAsText(file);
+  });
+};
+
+// Convertir formato VTT (00:00:00.000) a segundos
+const convertVttTimeToSeconds = (timeStr) => {
+  const parts = timeStr.split(':');
+  if (parts.length === 3) {
+    const hours = parseFloat(parts[0]);
+    const minutes = parseFloat(parts[1]);
+    const seconds = parseFloat(parts[2]);
+    return (hours * 3600) + (minutes * 60) + seconds;
+  }
+  return 0;
+};
+
 /**
  * Maneja la selección del archivo de video
  */
@@ -161,6 +218,30 @@ const removeSubtitle = (index) => {
 const generatePreview = async () => {
   if (!videoData.file) return;
 
+  // Validación de duración
+  try {
+    const videoDuration = await getMediaDuration(videoData.file);
+    
+    // Verificar audios
+    for (const audioFile of videoData.audioFiles) {
+      const audioDuration = await getMediaDuration(audioFile);
+      if (Math.abs(audioDuration - videoDuration) > 0.5) {
+        throw new Error(`El audio "${audioFile.name}" no coincide con la duración del video`);
+      }
+    }
+    
+    // Verificar subtítulos
+    for (const subFile of videoData.subtitleFiles) {
+      const subDuration = await getSubtitleDuration(subFile);
+      if (Math.abs(subDuration - videoDuration) > 0.5) {
+        throw new Error(`Los subtítulos "${subFile.name}" no coinciden con la duración del video`);
+      }
+    }
+  } catch (error) {
+    alert(`Error: ${error.message}`);
+    return;
+  }
+
   // Limpiar URLs previas si se regenera la preview
   if (previewVideoSrc.value) URL.revokeObjectURL(previewVideoSrc.value);
   audioTracks.value.forEach(track => track.url && URL.revokeObjectURL(track.url));
@@ -173,16 +254,18 @@ const generatePreview = async () => {
   audioTracks.value = [{ label: 'Audio original', url: null }];
   videoData.audioFiles.forEach(file => {
     audioTracks.value.push({
-      label: file.name.replace(/\.[^/.]+$/, ""), // Nombre sin extensión
-      url: URL.createObjectURL(file)
+      label: `${file.name.replace(/\.[^/.]+$/, "")} (${formatFileSize(file.size)})`,
+      url: URL.createObjectURL(file),
+      rawName: file.name.replace(/\.[^/.]+$/, "") // Guardamos el nombre original sin tamaño
     });
   });
 
   // Poblar pistas de subtítulos
   subtitles.value = videoData.subtitleFiles.map(file => ({
-    label: file.name.replace('.vtt', '').replace(/_/g, ' '),
+    label: `${file.name.replace('.vtt', '').replace(/_/g, ' ')} (${formatFileSize(file.size)})`,
     url: URL.createObjectURL(file),
-    lang: 'es' // Puedes hacerlo más dinámico si lo necesitas
+    lang: 'es',
+    rawName: file.name.replace('.vtt', '').replace(/_/g, ' ') // Guardamos el nombre original sin tamaño
   }));
 
   showPreview.value = true;
@@ -212,17 +295,15 @@ const initVideoPlayer = () => {
       src: previewVideoSrc.value,
       type: videoData.file.type
     }],
-    // --- CAMBIO CLAVE: Añadir las pistas de subtítulos aquí ---
     tracks: subtitles.value.map((sub, index) => ({
       kind: 'subtitles',
       src: sub.url,
       srclang: sub.lang,
-      label: sub.label,
-      default: index === 0 // El primero es el predeterminado
+      label: sub.rawName, // Usamos el nombre sin el tamaño para el reproductor
+      default: index === 0
     }))
   }, () => {
     console.log('Reproductor listo!');
-    // Puedes personalizar el botón de subtítulos aquí si lo necesitas
     const subsButton = playerInstance.value.controlBar.subsCapsButton;
     if (subsButton) {
         subsButton.controlText('Subtítulos');
@@ -244,12 +325,10 @@ const changeAudioTrack = () => {
   const currentTime = playerInstance.value.currentTime();
   const playbackRate = playerInstance.value.playbackRate();
   
-  // Solo pausar si estamos cambiando a un audio externo
   if (selectedAudioTrack.value !== 0 && audioElement.value) {
     playerInstance.value.pause();
   }
   
-  // Limpiar audio externo anterior si existe
   if (audioElement.value) {
     audioElement.value.pause();
     audioElement.value = null;
@@ -260,10 +339,7 @@ const changeAudioTrack = () => {
   const trackIndex = selectedAudioTrack.value;
   
   if (trackIndex === 0) {
-    // Audio original - restaurar volumen normal sin interrumpir reproducción
     playerInstance.value.volume(1);
-    
-    // Si estaba reproduciendo, continuar sin pausa
     if (wasPlaying) {
       playerInstance.value.play().catch(e => console.error("Error al reanudar:", e));
     }
@@ -271,12 +347,10 @@ const changeAudioTrack = () => {
   else if (trackIndex > 0 && trackIndex < audioTracks.value.length) {
     const track = audioTracks.value[trackIndex];
     
-    // Configurar audio externo
     audioElement.value = new Audio(track.url);
     audioElement.value.currentTime = currentTime;
     audioElement.value.playbackRate = playbackRate;
     
-    // Listeners mejorados
     const onPlay = () => {
       if (audioElement.value.paused) {
         audioElement.value.currentTime = playerInstance.value.currentTime();
@@ -297,7 +371,7 @@ const changeAudioTrack = () => {
     
     const onTimeupdate = () => {
       const diff = Math.abs(audioElement.value.currentTime - playerInstance.value.currentTime());
-      if (diff > 0.15) { // Umbral optimizado
+      if (diff > 0.15) {
         audioElement.value.currentTime = playerInstance.value.currentTime();
       }
     };
@@ -306,7 +380,6 @@ const changeAudioTrack = () => {
       audioElement.value.playbackRate = playerInstance.value.playbackRate();
     };
     
-    // Asignar listeners
     playerInstance.value.on('play', onPlay);
     playerInstance.value.on('pause', onPause);
     playerInstance.value.on('seeking', onSeeking);
@@ -321,10 +394,8 @@ const changeAudioTrack = () => {
       ratechange: onRatechange
     };
     
-    // Configurar volúmenes
     playerInstance.value.volume(0);
     
-    // Iniciar reproducción si estaba en play
     if (wasPlaying) {
       playerInstance.value.play().then(() => {
         audioElement.value.play().catch(e => console.error("Error al iniciar audio externo:", e));
@@ -332,7 +403,6 @@ const changeAudioTrack = () => {
     }
   }
 };
-
 
 /**
  * Formatea el tamaño del archivo para mostrarlo
@@ -457,9 +527,17 @@ const removeSyncListeners = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
   padding: 8px;
   border-bottom: 1px solid #f0f0f0;
   font-size: 14px;
+}
+
+.file-item span {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .file-item:last-child {
