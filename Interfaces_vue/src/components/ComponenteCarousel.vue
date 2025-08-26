@@ -6,7 +6,7 @@
   <Carousel v-bind="config" class="contendor">
     <Slide v-for="(image, index) in imagenes" :key="index">
       <div class="custom-slide" @click="openModal(image)">
-        <img :src="image.img" :alt="image.title" />
+        <img :src="image.url" :alt="image.name" />
       </div>
     </Slide>
 
@@ -24,8 +24,8 @@
       <div class="modal-grid">
         <div class="image-container">
           <img 
-            :src="selectedImage.img" 
-            :alt="selectedImage.title" 
+            :src="selectedImage.url" 
+            :alt="selectedImage.name" 
             ref="modalImage" 
             @load="onImageLoad"
             class="modal-image"
@@ -33,7 +33,7 @@
         </div>
         
         <div class="details-container">
-          <h3 class="image-title">{{ selectedImage.title }}</h3>
+          <h3 class="image-title">{{ selectedImage.name }}</h3>
           
           <div class="detail-item">
             <span class="detail-label">Dimensiones:</span>
@@ -42,12 +42,12 @@
           
           <div class="detail-item">
             <span class="detail-label">Formato:</span>
-            <span class="detail-value">{{ imageFormat }}</span>
+            <span class="detail-value">{{ selectedImage.format }}</span>
           </div>
           
           <div class="detail-item">
             <span class="detail-label">Tamaño:</span>
-            <span class="detail-value">{{ fileSize }}</span>
+            <span class="detail-value">{{ formatFileSize(selectedImage.size) }}</span>
           </div>
         </div>
       </div>
@@ -57,17 +57,19 @@
 
 <script setup>
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel';
-import { ref, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import 'vue3-carousel/carousel.css'
-import t1 from '@/assets/img/carousel/testimonial-1.jpg'
-import t2 from '@/assets/img/carousel/testimonial-2.jpg'
-import t3 from '@/assets/img/carousel/testimonial-3.jpg'
-import t4 from '@/assets/img/carousel/testimonial-4.jpg'
-import t5 from '@/assets/img/carousel/testimonial-5.jpg'
-import t6 from '@/assets/img/foto.png'
-import t7 from '@/assets/img/about-extra-1.svg'
-import t8 from '@/assets/img/intro-bg.png'
+//import t1 from '@/assets/img/carousel/testimonial-1.jpg'
+//import t2 from '@/assets/img/carousel/testimonial-2.jpg'
+//import t3 from '@/assets/img/carousel/testimonial-3.jpg'
+//import t4 from '@/assets/img/carousel/testimonial-4.jpg'
+//import t5 from '@/assets/img/carousel/testimonial-5.jpg'
+//import t6 from '@/assets/img/foto.png'
+//import t7 from '@/assets/img/about-extra-1.svg'
+//import t8 from '@/assets/img/intro-bg.png'
+import { imageService } from "@/services/project_4/multimediaService"
 
+/*
 const imagenes = ref([
     { img: t1, title: 'Imagen 1' },
     { img: t2, title: 'Imagen 2' },
@@ -78,6 +80,20 @@ const imagenes = ref([
     { img: t7, title: 'EXTRA, extra' },
     { img: t8, title: 'EXTRA, extra2' }
 ]);
+*/
+
+const imagenes = ref([]);
+
+const fetchImages = async () => {
+  try {
+    const response = await imageService.getImages();
+    if(response && response.data) {
+      imagenes.value = response.data;
+    }
+  } catch (error) {
+    console.error('Error fetching images:', error);
+  }
+};
 
 const config = {
   width: 300,
@@ -113,6 +129,7 @@ const onImageLoad = () => {
   }
 };
 
+/*
 // Calcular formato de la imagen
 const imageFormat = computed(() => {
   if (!selectedImage.value) return '';
@@ -138,6 +155,20 @@ const fileSize = computed(() => {
   } else {
     return `${(estimatedSizeKB / 1024).toFixed(1)} MB`;
   }
+});
+*/
+
+// Formatear tamaño del archivo
+const formatFileSize = (bytes) => {
+  if (!bytes) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
+onMounted(() => {
+  fetchImages();
 });
 </script>
 
