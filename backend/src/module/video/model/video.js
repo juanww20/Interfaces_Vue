@@ -1,4 +1,4 @@
-import { Video } from "../../../models/tables.js";
+import { Video, Audio, Subtitulo } from "../../../models/tables.js";
 
 export class ModelVideo {
 
@@ -21,7 +21,15 @@ export class ModelVideo {
 
         try {
 
-            const videos = await Video.findAll();
+            const videos = await Video.findAll({
+                include: [{
+                    model: Audio,
+                    as: "audios"
+                }, {
+                    model: Subtitulo,
+                    as: "subtitulos"
+                }]
+            });
 
             if (!videos || videos.length === 0) return { message: "No videos found", data: [], status: 404 };
 

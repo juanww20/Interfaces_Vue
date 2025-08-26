@@ -59,14 +59,30 @@ export class ControllerVideo {
 
             if (result.status === 404) return res.status(result.status).json({ message: result.message });
 
-            const formattedVideos = result.data.map(video => ({
-                video_id: video.video_id,
-                name: video.nombre,
-                format: video.formato,
-                size: video.size,
-                duration: video.duration,
-                path: `${req.protocol}://${req.get('host')}/videos/${video.path}`,
-            }));
+            const formattedVideos = result.data.map(video => {
+                const v = video.toJSON(); // convierte a objeto plano
+
+                // cambiar solo el path del video
+                v.path = `${req.protocol}://${req.get('host')}/videos/${v.path}`;
+
+                // si hay audios, ajustar path
+                if (v.audios) {
+                    v.audios = v.audios.map(audio => ({
+                        ...audio,
+                        path: `${req.protocol}://${req.get('host')}/audios/${audio.path}`
+                    }));
+                }
+
+                // si hay subtitulos, ajustar path
+                if (v.subtitulos) {
+                    v.subtitulos = v.subtitulos.map(sub => ({
+                        ...sub,
+                        path: `${req.protocol}://${req.get('host')}/subtitulos/${sub.path}`
+                    }));
+                }
+
+                return v;
+            });
 
             return res.status(result.status).json({ message: result.message, data: formattedVideos });
 

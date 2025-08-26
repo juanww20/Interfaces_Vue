@@ -11,7 +11,7 @@
           <div class="video-title">
             <h3 class="Cambio_subtitulo">{{ video.title }}</h3>
           </div>
-          <div class="video-subtitle-indicator" v-if="video.subtitles.length > 0">
+          <div class="video-subtitle-indicator" v-if="video.subtitles && video.subtitles.length > 0">
             <span class="subtitle-icon">CC</span>
           </div>
         </div>
@@ -40,7 +40,7 @@
 
             <div class="detail-item">
               <span class="detail-label">Nombre:</span>
-              <span class="detail-value">{{ selectedVideo.title }}</span>
+              <span class="detail-value">{{ selectedVideo.nombre }}</span>
             </div>
 
             <div class="detail-item">
@@ -50,7 +50,7 @@
 
             <div class="detail-item">
               <span class="detail-label">Formato:</span>
-              <span class="detail-value">{{ selectedVideo.format }}</span>
+              <span class="detail-value">{{ selectedVideo.formato }}</span>
             </div>
 
             <div class="detail-item">
@@ -67,7 +67,7 @@
               <label for="audio-track">Pista de audio:</label>
               <select id="audio-track" v-model="selectedAudioTrack" @change="changeAudioTrack">
                 <option v-for="(track, index) in audioTracks" :key="index" :value="index">
-                  {{ track.label }}
+                  {{ track.idioma }}
                 </option>
               </select>
             </div>
@@ -91,14 +91,15 @@
 <script setup>
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel';
 import 'vue3-carousel/carousel.css';
-import { ref, reactive, onBeforeUnmount, nextTick, onMounted } from 'vue';
+import { ref, onBeforeUnmount, nextTick, onMounted } from 'vue';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
-import VideoExample from '@/assets/temp/eu.mp4'
+//import VideoExample from '@/assets/video/John Newman - Love Me Again.mp4'
 //import ImagenExample from '@/assets/img/intro-bg.png'
-import AudioExample from '@/assets/temp/0006.mp3'
-import SubtituloExample from '@/assets/temp/op.vtt'
-import SubtituloExample2 from '@/assets/temp/op1.vtt'
+//import AudioExample from '@/assets/audio/John Newman - Love Me Again.mp3'
+//import SubtituloExample from '@/assets/subtitulos/[SubtitleTools.com] [English - English] John Newman - Love Me Again [DownSub.com].vtt'
+//import SubtituloExample2 from '@/assets/subtitulos/[SubtitleTools.com] [Spanish - Spanish] John Newman - Love Me Again [DownSub.com].vtt'
+import { videoService } from "@/services/project_4/multimediaService"
 
 /**
  * Genera una miniatura de un video en un punto de tiempo específico.
@@ -154,6 +155,7 @@ const generateVideoThumbnail = (videoSrc) => {
 // ];
 
 // Videos de ejemplo con subtítulos
+/*
 const videos = ref([
   {
     id: 1,
@@ -218,6 +220,17 @@ const videos = ref([
     subtitles: [{ label: 'Español', lang: 'es', src: SubtituloExample }] // Ambos idiomas
   }
 ]);
+*/
+
+const videos = ref([]);
+
+const fetchVideoData = async () => {
+  const res = await videoService.getVideos();
+  console.log("Respuesta de la fetch", res);
+  if (res && res.data) {
+    videos.value = res.data;
+  }
+}
 
 const config = {
   width: 300,
@@ -249,7 +262,7 @@ const syncListeners = ref({
 // Abrir modal
 const openModal = (video) => {
   selectedVideo.value = video;
-  audioTracks.value = video.audioTracks;
+  audioTracks.value = video.audios;
   selectedAudioTrack.value = 0;
   selectedSubtitleTrack.value = -1;
 
@@ -290,14 +303,14 @@ const initVideoPlayer = () => {
     fluid: true,
     playbackRates: [0.5, 1, 1.5, 2],
     sources: [{
-      src: selectedVideo.value.videoSrc,
-      type: 'video/mp4'
+      src: selectedVideo.value.path,
+      type: selectedVideo.value.formato
     }],
-    tracks: selectedVideo.value.subtitles.map((subtitle, index) => ({
+    tracks: selectedVideo.value.subtitulos.map((subtitle, index) => ({
       kind: 'subtitles',
-      label: subtitle.label,
-      srclang: subtitle.lang,
-      src: subtitle.src,
+      label: subtitle.idioma,
+      srclang: subtitle.idioma,
+      src: subtitle.path,
       default: index === 0
     }))
   }, () => {
@@ -342,6 +355,7 @@ const initVideoPlayer = () => {
 };
 
 // Cambiar subtítulos
+/*
 const changeSubtitleTrack = () => {
   if (!playerInstance.value) return;
 
@@ -358,6 +372,7 @@ const changeSubtitleTrack = () => {
     textTracks[trackIndex].mode = 'showing';
   }
 };
+*/
 
 // Cambiar pista de audio (igual que antes)
 const changeAudioTrack = () => {
@@ -381,7 +396,7 @@ const changeAudioTrack = () => {
 
     playerInstance.value.pause();
 
-    audioElement.value = new Audio(track.src);
+    audioElement.value = new Audio(track.path);
     audioElement.value.currentTime = currentTime;
     audioElement.value.playbackRate = playbackRate;
 
@@ -478,12 +493,17 @@ onBeforeUnmount(() => {
 });
 
 onMounted(async () => {
-  console.log('Generando portadas de video...');
+
+  console.log("Cargando videos...");
   try {
+
+    await fetchVideoData();
+
+    console.log('Generando portadas de video...', videos.value);
     for (const video of videos.value) {
       // Solo genera la miniatura si no la tiene ya
       if (!video.thumbnail) {
-        const thumbnailUrl = await generateVideoThumbnail(video.videoSrc);
+        const thumbnailUrl = await generateVideoThumbnail(video.path);
         video.thumbnail = thumbnailUrl;
       }
     }
@@ -492,6 +512,7 @@ onMounted(async () => {
     console.error('Ocurrió un error al generar las portadas:', error);
   }
 });
+
 </script>
 
 <style scoped>
