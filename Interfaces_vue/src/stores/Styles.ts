@@ -43,7 +43,7 @@ export const useStyleStore = defineStore('style', {
         url_secundary: string
       },
     }) {
-      console.log('Applying font styles:', font)
+      //console.log('Applying font styles:', font)
       const root = document.documentElement.style;
       // Aplicar tamaños si existen
       if (font.title) {
