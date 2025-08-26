@@ -86,16 +86,19 @@ export const userService = {
     }
   },
 
-  async getSectionId(){
+  async getSectionId() {
     try {
       const res = await api.get('/auth/me')
-      if (res.status === 200) {
-        return { status: true, data: res.data.data }
-      }
+      return { status: true, data: res.data.data }
     } catch (error) {
+      if (error.response?.status === 401) {
+        // No logueado
+        return { status: false }
+      }
+      // Otro tipo de error
       console.error('Error al obtener sección por ID:', error)
-      return false
+      return { status: false, error: 'internal' }
     }
-    return false
   }
+
 }
