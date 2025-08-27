@@ -40,6 +40,7 @@
         <p><strong>Dimensiones:</strong> {{ croppedDimensions.width }} × {{ croppedDimensions.height }} píxeles</p>
         <p><strong>Tamaño de archivo:</strong> {{ formatFileSize(croppedFileSize) }}</p>
       </div>
+      <button @click="uploadCroppedImage" class="upload-btn">Subir Imagen Recortada</button>
     </div>
   </div>
 </template>
@@ -49,6 +50,8 @@ import { ref } from 'vue';
 import Icono_foto from '@/assets/img/foto.png'
 import VueCropper from 'vue-cropperjs';
 import '@/views/Admin_componentes/cropper.css'
+import { imageService } from "@/services/project_4/multimediaService"
+import Swal from 'sweetalert2';
 
 // Referencias reactivas
 const fileInput = ref(null);
@@ -162,6 +165,58 @@ const formatFileSize = (bytes) => {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
+
+const uploadCroppedImage = async () => {
+  if (!croppedImage.value) return;
+
+  const canvas = cropper.value.getCroppedCanvas();
+  canvas.toBlob(async (blob) => {
+    if (!blob) return;
+
+    // Crear archivo con nombre
+    const file = new File([blob], croppedFileName.value, { type: selectedFile.value.type || 'image/png' });
+
+    // Armar el FormData
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      // Mostrar loading mientras se sube
+      Swal.fire({
+        title: "Subiendo imagen...",
+        text: "Por favor espera",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      const response = await imageService.createImage(formData);
+
+      // Éxito
+      Swal.fire({
+        icon: "success",
+        title: "¡Imagen subida!",
+        text: "La imagen se subió correctamente.",
+        confirmButtonText: "Aceptar"
+      });
+
+      console.log("✅ Imagen subida correctamente:", response.data);
+
+    } catch (error) {
+      console.error("❌ Error al subir imagen:", error);
+
+      // Error
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo subir la imagen. Intenta de nuevo.",
+        confirmButtonText: "Reintentar"
+      });
+    }
+  }, selectedFile.value.type || 'image/png', 0.92);
+};
+
 </script>
 
 <style scoped>
@@ -249,4 +304,10 @@ button:hover {
   font-size: 14px;
   color: #555;
 }
+
+.upload-btn {
+  margin-top: 10px;
+  background-color: #2196F3;
+}
+
 </style>
