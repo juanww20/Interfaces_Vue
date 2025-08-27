@@ -19,7 +19,7 @@ export const videoService = {
     }
   },
 
-  async getVideo(id: number) {
+  async getVideo(id: String) {
     try {
         const response = await api.get(`/video/${id}`);
         return response.data;
@@ -39,7 +39,7 @@ export const videoService = {
     }
   },
 
-  async updateVideo(id: number, data: any) {
+  async updateVideo(id: String, data: any) {
     try {
         const response = await api.put(`/video/${id}`, data);
         return response.data;
@@ -49,7 +49,7 @@ export const videoService = {
     }
   },
 
-  async deleteVideo(id: number) {
+  async deleteVideo(id: String) {
     try {
         const response = await api.delete(`/video/${id}`);
         return response.data;

@@ -3,10 +3,6 @@
     <div class="upload-section">
       <h2>Subir y Configurar Video</h2>
       <form @submit.prevent="handleSubmit" class="upload-form">
-        <div class="form-group">
-          <label for="video-name">Nombre del video:</label>
-          <input id="video-name" v-model="videoData.name" type="text" required placeholder="Ej: Mi video increíble" />
-        </div>
 
         <div class="form-group">
           <label for="video-file">Archivo de video (MP4):</label>
@@ -22,6 +18,14 @@
           <div v-if="videoData.audioFiles.length > 0" class="file-list">
             <div v-for="(file, index) in videoData.audioFiles" :key="index" class="file-item">
               <span>{{ file.name }} ({{ formatFileSize(file.size) }})</span>
+              <!-- Nuevo campo para idioma -->
+              <input
+                type="text"
+                v-model="videoData.audioFiles[index].language"
+                placeholder="Idioma: es, en, fr"
+                class="lang-input"
+                style="width: 100px ; margin-left: 8px; padding: 2px 5px; font-size: 12px;"
+              />
               <button @click.prevent="removeAudio(index)" class="remove-btn">×</button>
             </div>
           </div>
@@ -33,6 +37,14 @@
           <div v-if="videoData.subtitleFiles.length > 0" class="file-list">
             <div v-for="(file, index) in videoData.subtitleFiles" :key="index" class="file-item">
               <span>{{ file.name }} ({{ formatFileSize(file.size) }})</span>
+              <!-- Nuevo campo para idioma -->
+              <input
+                type="text"
+                v-model="videoData.subtitleFiles[index].language"
+                placeholder="Idioma: es, en, fr"
+                class="lang-input"
+                style="width: 100px ; margin-left: 8px; padding: 2px 5px; font-size: 12px;"
+              />
               <button @click.prevent="removeSubtitle(index)" class="remove-btn">×</button>
             </div>
           </div>
@@ -71,6 +83,8 @@
 import { ref, reactive, onBeforeUnmount, nextTick } from 'vue';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
+import { videoService, audioService, subtituloService } from "@/services/project_4/multimediaService"
+import Swal from "sweetalert2"
 
 // Datos del formulario
 const videoData = reactive({
@@ -222,6 +236,7 @@ const generatePreview = async () => {
   try {
     const videoDuration = await getMediaDuration(videoData.file);
     
+    /*
     // Verificar audios
     for (const audioFile of videoData.audioFiles) {
       const audioDuration = await getMediaDuration(audioFile);
@@ -229,14 +244,18 @@ const generatePreview = async () => {
         throw new Error(`El audio "${audioFile.name}" no coincide con la duración del video`);
       }
     }
+    */
     
     // Verificar subtítulos
+    /*
     for (const subFile of videoData.subtitleFiles) {
       const subDuration = await getSubtitleDuration(subFile);
       if (Math.abs(subDuration - videoDuration) > 0.5) {
         throw new Error(`Los subtítulos "${subFile.name}" no coinciden con la duración del video`);
       }
     }
+    */
+
   } catch (error) {
     alert(`Error: ${error.message}`);
     return;
@@ -310,7 +329,7 @@ const initVideoPlayer = () => {
     }
   });
 
-  playerInstance.value.on('error', (e) => {
+  playerInstance.value.on('error', () => {
     console.error('Error del reproductor:', playerInstance.value.error());
   });
 };
@@ -418,14 +437,72 @@ const formatFileSize = (bytes) => {
 /**
  * Maneja el envío final del formulario (simulado)
  */
-const handleSubmit = () => {
-  console.log('Datos del video a subir:', {
-    name: videoData.name,
-    video: videoData.file,
-    audioFiles: videoData.audioFiles,
-    subtitleFiles: videoData.subtitleFiles
-  });
-  alert('Video listo para ser subido. Revisa la consola para ver los datos. En una implementación real, aquí se enviaría todo al servidor.');
+const handleSubmit = async () => {
+
+  let videoId = null;
+
+  try {
+    Swal.fire({
+      title: "Subiendo...",
+      text: "Por favor espera mientras se cargan los archivos",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    // 1. Subir el video principal
+    console.log("video data:", videoData);
+    const formDataVideo = new FormData();
+    formDataVideo.append("video", videoData.file);
+
+    const video = await videoService.createVideo(formDataVideo);
+
+    videoId = video.data.video_id;
+    if (!videoId) {
+      throw new Error("No se pudo obtener el ID del video subido");
+    }
+
+    // 2. Subir audios con su video_id
+    for (const audio of videoData.audioFiles) {
+
+      console.log("audio: ", audio)
+      const formDataAudio = new FormData();
+      formDataAudio.append("audio", audio);
+      formDataAudio.append("idioma", audio.language);
+      formDataAudio.append("video_id", String(videoId));
+
+      await audioService.createAudio(formDataAudio);
+    }
+
+    // 3. Subir subtítulos con su video_id
+    for (const subtitle of videoData.subtitleFiles) {
+
+      console.log("subtitulo: ", subtitle)
+      const formDataSubtitle = new FormData();
+      formDataSubtitle.append("subtitulo", subtitle);
+      formDataSubtitle.append("idioma", subtitle.language);
+      formDataSubtitle.append("video_id", String(videoId));
+
+      await subtituloService.createSubtitulo(formDataSubtitle);
+    }
+
+    Swal.fire({
+      icon: "success",
+      title: "¡Éxito!",
+      text: "El video, audios y subtítulos fueron subidos correctamente 🎉"
+    });
+  } catch (error) {
+
+    if(videoId) await videoService.deleteVideo(videoId);
+
+    console.error("❌ Error al subir los archivos:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: error.message || "Hubo un problema al subir los archivos"
+    });
+  }
 };
 
 /**
@@ -464,7 +541,7 @@ const removeSyncListeners = () => {
 
 <style scoped>
 .video-upload-container {
-  max-width: 1200px;
+  max-width: 1210px;
   margin: 0 auto;
   padding: 20px;
   font-family: Arial, sans-serif;
