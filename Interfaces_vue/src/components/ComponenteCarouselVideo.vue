@@ -14,6 +14,14 @@
           <div class="video-subtitle-indicator" v-if="video.subtitles && video.subtitles.length > 0">
             <span class="subtitle-icon">CC</span>
           </div>
+
+          <!-- Botón solo visible si eres admin -->
+          <button 
+            v-if="showDelete && isAdmin" 
+            class="delete-btn" 
+            @click.stop="confirmDelete(video.video_id)">
+            🗑 Eliminar
+          </button>
         </div>
       </Slide>
 
@@ -91,7 +99,7 @@
 <script setup>
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel';
 import 'vue3-carousel/carousel.css';
-import { ref, onBeforeUnmount, nextTick, onMounted } from 'vue';
+import { ref, onBeforeUnmount, nextTick, onMounted, computed, defineProps } from 'vue';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
 //import VideoExample from '@/assets/video/John Newman - Love Me Again.mp4'
@@ -100,6 +108,19 @@ import 'video.js/dist/video-js.css';
 //import SubtituloExample from '@/assets/subtitulos/[SubtitleTools.com] [English - English] John Newman - Love Me Again [DownSub.com].vtt'
 //import SubtituloExample2 from '@/assets/subtitulos/[SubtitleTools.com] [Spanish - Spanish] John Newman - Love Me Again [DownSub.com].vtt'
 import { videoService } from "@/services/project_4/multimediaService"
+import { useAuthStore } from '@/stores/Auth';
+import Swal from 'sweetalert2';
+
+const authStore = useAuthStore();
+
+const isAdmin = computed(() => authStore.user.role === 'admin');
+
+defineProps({
+  showDelete: {
+    type: Boolean,
+    default: false
+  }
+});
 
 /**
  * Genera una miniatura de un video en un punto de tiempo específico.
@@ -231,6 +252,38 @@ const fetchVideoData = async () => {
     videos.value = res.data;
   }
 }
+
+const confirmDelete = async (id) => {
+  const result = await Swal.fire({
+    title: "¿Eliminar imagen?",
+    text: "Esta acción no se puede deshacer",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Sí, eliminar",
+    cancelButtonText: "Cancelar"
+  });
+
+  if (result.isConfirmed) {
+    try {
+      await videoService.deleteVideo(id); // 👈 Llamada API
+      fetchVideoData(); // Volver a obtener los videos
+
+      for (const video of videos.value) {
+        // Solo genera la miniatura si no la tiene ya
+        if (!video.thumbnail) {
+          const thumbnailUrl = await generateVideoThumbnail(video.path);
+          video.thumbnail = thumbnailUrl;
+        }
+      }
+      Swal.fire("Eliminado", "El video ha sido eliminado", "success");
+    } catch (error) {
+      console.error(error);
+      Swal.fire("Error", "No se pudo eliminar el video", "error");
+    }
+  }
+};
 
 const config = {
   width: 300,
@@ -565,6 +618,30 @@ onMounted(async () => {
 .custom-slide:hover {
   transform: translateY(-10px);
   box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* Botón eliminar como overlay */
+.delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255, 0, 0, 0.85);
+  border: none;
+  color: white;
+  font-size: 16px;
+  padding: 6px 10px;
+  border-radius: 20%;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.custom-slide:hover .delete-btn {
+  opacity: 1; /* solo se ve cuando pasas el mouse */
+}
+
+.delete-btn:hover {
+  background: red;
 }
 
 .video-thumbnail {

@@ -7,6 +7,14 @@
     <Slide v-for="(image, index) in imagenes" :key="index">
       <div class="custom-slide" @click="openModal(image)">
         <img :src="image.url" :alt="image.name" />
+
+        <!-- Botón solo visible si eres admin -->
+        <button 
+          v-if="showDelete && isAdmin" 
+          class="delete-btn" 
+          @click.stop="confirmDelete(image.image_id)">
+          🗑 Eliminar
+        </button>
       </div>
     </Slide>
 
@@ -57,7 +65,7 @@
 
 <script setup>
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed, defineProps } from 'vue';
 import 'vue3-carousel/carousel.css'
 //import t1 from '@/assets/img/carousel/testimonial-1.jpg'
 //import t2 from '@/assets/img/carousel/testimonial-2.jpg'
@@ -68,6 +76,19 @@ import 'vue3-carousel/carousel.css'
 //import t7 from '@/assets/img/about-extra-1.svg'
 //import t8 from '@/assets/img/intro-bg.png'
 import { imageService } from "@/services/project_4/multimediaService"
+import { useAuthStore } from '@/stores/Auth';
+import Swal from 'sweetalert2';
+
+const authStore = useAuthStore();
+
+const isAdmin = computed(() => authStore.user.role === 'admin');
+
+defineProps({
+  showDelete: {
+    type: Boolean,
+    default: false
+  }
+});
 
 /*
 const imagenes = ref([
@@ -92,6 +113,30 @@ const fetchImages = async () => {
     }
   } catch (error) {
     console.error('Error fetching images:', error);
+  }
+};
+
+const confirmDelete = async (id) => {
+  const result = await Swal.fire({
+    title: "¿Eliminar imagen?",
+    text: "Esta acción no se puede deshacer",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Sí, eliminar",
+    cancelButtonText: "Cancelar"
+  });
+
+  if (result.isConfirmed) {
+    try {
+      await imageService.deleteImage(id); // 👈 Llamada API
+      fetchImages(); // Volver a obtener las imágenes
+      Swal.fire("Eliminada", "La imagen ha sido eliminada", "success");
+    } catch (error) {
+      console.error(error);
+      Swal.fire("Error", "No se pudo eliminar la imagen", "error");
+    }
   }
 };
 
@@ -209,6 +254,8 @@ img:hover {
   font-weight: bold;
   box-shadow: 0 4px 8px var(--dark-color);
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 
 .carousel__slide {
@@ -220,6 +267,30 @@ img:hover {
   height: 100%;
   object-fit: cover;
   border-radius: 8px;
+}
+
+/* Botón eliminar como overlay */
+.delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255, 0, 0, 0.85);
+  border: none;
+  color: white;
+  font-size: 16px;
+  padding: 6px 10px;
+  border-radius: 20%;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.custom-slide:hover .delete-btn {
+  opacity: 1; /* solo se ve cuando pasas el mouse */
+}
+
+.delete-btn:hover {
+  background: red;
 }
 
 .contendor {

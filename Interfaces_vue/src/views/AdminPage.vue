@@ -43,6 +43,13 @@
         >
             🎥 Videos
         </button>
+        <button 
+            @click="activeTab = 'galeriaconfig'" 
+            class="tab" 
+            :class="{ active: activeTab === 'galeriaconfig' }"
+        >
+            🖼️ Galeria
+        </button>
         </div>
 
         <ColorsPanel v-if="activeTab === 'colors'" />
@@ -51,6 +58,7 @@
         <LoaderConfig v-if="activeTab === 'loaderconfig'" />
         <FotosEditar v-if="activeTab === 'fotoseditar'" />
         <VideosEditar v-if="activeTab === 'videoseditar'"/>
+        <GaleriaComponente v-if="activeTab === 'galeriaconfig'"/>
    </div>
 </template>
 
@@ -62,6 +70,7 @@ import UsersPanel from './Admin_componentes/DatatableComponente.vue';
 import LoaderConfig from './Admin_componentes/LoaderConfig.vue';
 import FotosEditar from './Admin_componentes/FotosEditar.vue';
 import VideosEditar from './Admin_componentes/VideosEditar.vue';
+import GaleriaComponente from './Admin_componentes/GaleriaComponente.vue'; './Admin_componentes/GaleriaComponente.vue';
 
 const activeTab = ref('colors'); // Valor inicial
 </script>
