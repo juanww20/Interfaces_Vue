@@ -236,7 +236,7 @@ const generatePreview = async () => {
   try {
     const videoDuration = await getMediaDuration(videoData.file);
     
-    /*
+    
     // Verificar audios
     for (const audioFile of videoData.audioFiles) {
       const audioDuration = await getMediaDuration(audioFile);
@@ -244,17 +244,16 @@ const generatePreview = async () => {
         throw new Error(`El audio "${audioFile.name}" no coincide con la duración del video`);
       }
     }
-    */
+    
     
     // Verificar subtítulos
-    /*
     for (const subFile of videoData.subtitleFiles) {
       const subDuration = await getSubtitleDuration(subFile);
       if (Math.abs(subDuration - videoDuration) > 0.5) {
         throw new Error(`Los subtítulos "${subFile.name}" no coinciden con la duración del video`);
       }
     }
-    */
+    
 
   } catch (error) {
     alert(`Error: ${error.message}`);

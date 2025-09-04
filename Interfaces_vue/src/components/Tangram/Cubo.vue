@@ -59,7 +59,7 @@ export default {
   position: absolute;
   width: 100px;
   height: 100px;
-  background-color: #ff0303d9;
+  background-color: var(--tertiary-color);
 }
 
 /* Profundidad ajustada: solo 36px → ±18px desde el centro */
@@ -72,20 +72,20 @@ export default {
 .face.right {
   width: 36px;
   transform: rotateY(90deg) translateZ(82px);
-  background-color: #990000d9;
+  background-color: var(--tertiary-color);
 }
 .face.left {
-  background-color: #990000d9;
+  background-color: var(--tertiary-color);
   width: 36px;
   transform: rotateY(-90deg) translateZ(18px);
 }
-.face.top { 
-    background-color: #ff0303d9;
+.face.top {
+    background-color: var(--tertiary-color);
     height: 36px;
   transform: rotateX(90deg) translateZ(18px);
 }
 .face.bottom {
-      background-color: #990000d9;
+      background-color: var(--tertiary-color);
 
         height: 36px;
 
