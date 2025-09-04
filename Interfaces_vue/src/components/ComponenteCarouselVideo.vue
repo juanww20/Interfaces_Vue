@@ -602,8 +602,7 @@ onMounted(async () => {
 }
 
 .custom-slide {
-  background: white;
-  color: #333;
+  background: var(--primary-color);
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -655,7 +654,10 @@ onMounted(async () => {
   padding: 15px 10px;
   text-align: center;
   font-weight: 600;
-  background: white;
+  background: var(--secondary-color);
+  color: var(--dark-color);
+  font-family: var(--font-secundaria);
+  font-size: var(--subtitle-font);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -709,7 +711,7 @@ onMounted(async () => {
 }
 
 .modal-content {
-  background: #e0e0e0;
+  background: var(--secondary-color);
   padding: 30px;
   border-radius: 15px;
   width: 90%;
@@ -725,7 +727,7 @@ onMounted(async () => {
   position: absolute;
   top: 15px;
   right: 15px;
-  background: #ff4d4d;
+  background: var(--dark-color);
   border: none;
   width: 40px;
   height: 40px;
@@ -741,7 +743,7 @@ onMounted(async () => {
 }
 
 .close-button:hover {
-  background: #ff1a1a;
+  background: var(--primary-color);
   transform: scale(1.1);
 }
 
@@ -776,18 +778,18 @@ onMounted(async () => {
 }
 
 .details-container {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--primary-color);
   padding: 20px;
   border-radius: 10px;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--primary-color);
 }
 
 .video-title {
   margin: 0 0 20px 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   padding-bottom: 15px;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 2px solid var(--primary-color);
 }
 
 .detail-item {
@@ -835,7 +837,7 @@ onMounted(async () => {
   padding: 10px 15px;
   border-radius: 8px;
   border: none;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--secondary-color);
   font-size: 1rem;
   min-width: 200px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
