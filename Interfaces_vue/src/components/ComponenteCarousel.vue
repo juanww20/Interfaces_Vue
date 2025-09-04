@@ -305,7 +305,7 @@ img:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color:rgba(0, 0, 0, 0.7); /*var(--dark-color)*/
   display: flex;
   justify-content: center;
   align-items: center;
@@ -314,7 +314,7 @@ img:hover {
 }
 
 .modal-content {
-  background: white;
+  background: var(--secondary-color);
   padding: 30px;
   border-radius: 12px;
   width: 90%;
@@ -352,7 +352,7 @@ img:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #f5f5f5;
+  background: var(--primary-color);
   border-radius: 8px;
   padding: 15px;
   height: 100%;
@@ -375,8 +375,8 @@ img:hover {
 .image-title {
   margin: 0;
   color: var(--primary-color);
-  font-size: 1.5rem;
-  border-bottom: 2px solid #eee;
+  font-size: var(--subtitle-font);
+  border-bottom: 2px solid var(--primary-color);
   padding-bottom: 10px;
 }
 
@@ -387,12 +387,14 @@ img:hover {
 
 .detail-label {
   font-weight: bold;
+  font-size: var(--text-font);
   color: var(--dark-color);
   min-width: 100px;
 }
 
 .detail-value {
-  color: #555;
+  color: var(--dark-color);
+  font-size: var(--text-font);
 }
 
 /* Responsive design para móviles */
